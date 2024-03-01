@@ -6,6 +6,7 @@ import type {
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import { useEffect, useRef } from "react";
+import { InputField } from "~/components/InputField";
 
 import { createUser, getUserByEmail } from "~/models/user.server";
 import { createUserSession, getUserId } from "~/session.server";
@@ -19,27 +20,99 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
+  const firstName = formData.get("firstName");
+  const lastName = formData.get("lastName");
   const email = formData.get("email");
   const password = formData.get("password");
+  const phoneNumber = formData.get("phoneNumber");
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
+
+  if (typeof firstName !== "string" || firstName.length === 0) {
+    return json(
+      {
+        errors: {
+          email: null,
+          password: null,
+          firstName: "First name is required",
+          lastName: null,
+          phoneNumber: null,
+        },
+      },
+      { status: 400 },
+    );
+  }
+
+  if (typeof lastName !== "string" || lastName.length === 0) {
+    return json(
+      {
+        errors: {
+          email: null,
+          password: null,
+          lastName: "Last name is required",
+          firstName: null,
+          phoneNumber: null,
+        },
+      },
+      { status: 400 },
+    );
+  }
+
+  if (typeof phoneNumber !== "string" || phoneNumber.length === 0) {
+    return json(
+      {
+        errors: {
+          email: null,
+          password: null,
+          lastName: null,
+          firstName: null,
+          phoneNumber: "Phone number is required",
+        },
+      },
+      { status: 400 },
+    );
+  }
 
   if (!validateEmail(email)) {
     return json(
-      { errors: { email: "Email is invalid", password: null } },
+      {
+        errors: {
+          email: "Email is invalid",
+          password: null,
+          firstName: null,
+          lastName: null,
+          phoneNumber: null,
+        },
+      },
       { status: 400 },
     );
   }
 
   if (typeof password !== "string" || password.length === 0) {
     return json(
-      { errors: { email: null, password: "Password is required" } },
+      {
+        errors: {
+          email: null,
+          password: "Password is required",
+          firstName: null,
+          lastName: null,
+          phoneNumber: null,
+        },
+      },
       { status: 400 },
     );
   }
 
   if (password.length < 8) {
     return json(
-      { errors: { email: null, password: "Password is too short" } },
+      {
+        errors: {
+          email: null,
+          password: "Password is too short",
+          firstName: null,
+          lastName: null,
+          phoneNumber: null,
+        },
+      },
       { status: 400 },
     );
   }
@@ -51,13 +124,21 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         errors: {
           email: "A user already exists with this email",
           password: null,
+          firstName: null,
+          lastName: null,
         },
       },
       { status: 400 },
     );
   }
 
-  const user = await createUser(email, password);
+  const user = await createUser(
+    email,
+    password,
+    firstName,
+    lastName,
+    phoneNumber,
+  );
 
   return createUserSession({
     redirectTo,
@@ -75,12 +156,19 @@ export default function Join() {
   const actionData = useActionData<typeof action>();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const phoneNumberRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (actionData?.errors?.email) {
       emailRef.current?.focus();
     } else if (actionData?.errors?.password) {
       passwordRef.current?.focus();
+    } else if (actionData?.errors?.firstName) {
+      firstNameRef.current?.focus();
+    } else if (actionData?.errors?.lastName) {
+      lastNameRef.current?.focus();
     }
   }, [actionData]);
 
@@ -88,61 +176,44 @@ export default function Join() {
     <div className="flex min-h-full flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
         <Form method="post" className="space-y-6">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email address
-            </label>
-            <div className="mt-1">
-              <input
-                ref={emailRef}
-                id="email"
-                required
-                // eslint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus={true}
-                name="email"
-                type="email"
-                autoComplete="email"
-                aria-invalid={actionData?.errors?.email ? true : undefined}
-                aria-describedby="email-error"
-                className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
-              />
-              {actionData?.errors?.email ? (
-                <div className="pt-1 text-red-700" id="email-error">
-                  {actionData.errors.email}
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <div className="mt-1">
-              <input
-                id="password"
-                ref={passwordRef}
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                aria-invalid={actionData?.errors?.password ? true : undefined}
-                aria-describedby="password-error"
-                className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
-              />
-              {actionData?.errors?.password ? (
-                <div className="pt-1 text-red-700" id="password-error">
-                  {actionData.errors.password}
-                </div>
-              ) : null}
-            </div>
-          </div>
-
+          <InputField
+            id="firstName"
+            label="First Name"
+            required
+            inputRef={firstNameRef}
+            errorText={actionData?.errors?.firstName}
+          />
+          <InputField
+            id="lastName"
+            label="Last Name"
+            required
+            inputRef={lastNameRef}
+            errorText={actionData?.errors?.lastName}
+          />
+          <InputField
+            id="email"
+            label="Email address"
+            required
+            inputRef={emailRef}
+            type="email"
+            errorText={actionData?.errors?.email}
+          />
+          <InputField
+            id="password"
+            label="Password"
+            required
+            inputRef={passwordRef}
+            type="password"
+            errorText={actionData?.errors?.password}
+          />
+          <InputField
+            id="phoneNumber"
+            label="Phone number"
+            required
+            inputRef={phoneNumberRef}
+            type="tel"
+            errorText={actionData?.errors?.password}
+          />
           <input type="hidden" name="redirectTo" value={redirectTo} />
           <button
             type="submit"

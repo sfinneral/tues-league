@@ -74,3 +74,14 @@ export function useUser(): User {
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export function getTeamName(team: any): string {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  return team.users.reduce((acc: any, curr: any) => {
+    if (acc === "") {
+      return curr.profile.lastName;
+    } else {
+      return `${acc} / ${curr.profile.lastName}`;
+    }
+  }, "");
+}

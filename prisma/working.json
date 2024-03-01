@@ -1,0 +1,24 @@
+{
+  "match": {
+    "id": "ldshfklsdjklfjsa",
+    "date": "some timestamp",
+    "scores": [
+      {
+        "id": "ldsjfkldsjlkfaj",
+        "team": {
+          "id": "odeijasfoidjsaf",
+          "name": "lastName / lastName"
+        },
+        "score": 33
+      },
+      {
+        "id": "ldsjfkldsjlkfaj",
+        "team": {
+          "id": "odeijasfoidjsaf",
+          "name": "lastName / lastName"
+        },
+        "score": 36
+      }
+    ]
+  }
+}
