@@ -25,7 +25,7 @@ export async function createSchedule(divisionId: Division['id'], leagueSlug: Lea
     let row2 = shuffle(row1.splice(0, row1.length / 2));
 
 
-    for (let index = 1; index < Number(numberOfWeeks); index++) {
+    for (let index = 0; index < Number(numberOfWeeks); index++) {
         const date = new Date(startDate + 'T08:00:00')
         date.setDate(date.getDate() + (7 * index))
         const week = await createWeek(date.toISOString(), schedule.id)
@@ -52,4 +52,41 @@ export async function getScheduleById(id: Schedule['id']) {
 
 export async function getScheduleByDivisionId(divisionId: Division['id']) {
     return prisma.schedule.findFirst({ where: { divisionId } })
+}
+
+export async function getSchedulesByLeagueSlug(slug: League['slug']) {
+    return prisma.schedule.findMany({
+        where: {
+            league: { slug }
+        },
+        include: {
+            division: true,
+            weeks: {
+                include: {
+                    matches: {
+                        include: {
+                            teams: {
+                                include: {
+                                    users: {
+                                        include: {
+                                            profile: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+}
+
+export async function deleteScheduleByDivisionId(id: Division['id']) {
+    return prisma.schedule.delete({
+        where: { divisionId: id },
+        include: {
+            division: true
+        }
+    })
 }

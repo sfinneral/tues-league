@@ -103,3 +103,9 @@ export function shuffle(array: Array<any>) {
 
   return array;
 }
+
+export function formatDate(dateString: string) {
+  return new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'full'
+  }).format(new Date(dateString))
+}

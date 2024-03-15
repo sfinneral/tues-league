@@ -19,6 +19,15 @@ export function getDivisionTeamsUsersProfileByLeagueSlug(slug: League['slug']) {
   });
 }
 
+export function getDivisionseByLeagueSlug(slug: League['slug']) {
+  return prisma.division.findMany({
+    where: { league: { slug } },
+    include: {
+      schedule: true
+    }
+  })
+}
+
 export function getDivisionsByLeague(league: League) {
   return prisma.division.findMany({
     where: { league },

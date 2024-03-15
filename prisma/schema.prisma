@@ -81,7 +81,7 @@ model Match {
   id     String  @id @default(cuid())
   scores Score[]
   teams  Team[]
-  Week   Week?   @relation(fields: [weekId], references: [id])
+  Week   Week?   @relation(fields: [weekId], references: [id], onDelete: Cascade)
   weekId String?
 }
 
@@ -92,7 +92,7 @@ model Score {
   teamId  String
   team    Team   @relation(fields: [teamId], references: [id])
   matchId String
-  match   Match  @relation(fields: [matchId], references: [id])
+  match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
 }
 
 model Schedule {
@@ -110,6 +110,6 @@ model Week {
   wasCancelled Boolean   @default(false)
   date         String
   matches      Match[]
-  Schedule     Schedule? @relation(fields: [scheduleId], references: [id])
+  Schedule     Schedule? @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
   scheduleId   String?
 }

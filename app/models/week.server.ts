@@ -1,4 +1,4 @@
-import { League, Schedule, Week } from "@prisma/client";
+import { Schedule, Week } from "@prisma/client";
 import { prisma } from "~/db.server";
 
 export function createWeek(date: Week['date'], scheduleId: Schedule['id']) {
@@ -8,8 +8,4 @@ export function createWeek(date: Week['date'], scheduleId: Schedule['id']) {
             scheduleId,
         },
     });
-}
-
-export function getSchedulesByLeagueSlug(leagueSlug: League['slug']) {
-    return prisma.league.findMany({ where: { slug: leagueSlug } })
 }
