@@ -55,6 +55,9 @@ export default function AdminLeagues() {
               <Link to={`/${league.slug}/teams`}>
                 <Button variant="surface">teams</Button>
               </Link>
+              <Link to={`/${league.slug}/schedules`}>
+                <Button variant="surface">schedules</Button>
+              </Link>
             </Flex>
           ))}
         </section>

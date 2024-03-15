@@ -1,3 +1,4 @@
+import { TextField } from "@radix-ui/themes";
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -6,7 +7,6 @@ import type {
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import { useEffect, useRef } from "react";
-import { InputField } from "~/components/InputField";
 
 import { createUser, getUserByEmail } from "~/models/user.server";
 import { createUserSession, getUserId } from "~/session.server";
@@ -176,44 +176,21 @@ export default function Join() {
     <div className="flex min-h-full flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
         <Form method="post" className="space-y-6">
-          <InputField
-            id="firstName"
-            label="First Name"
-            required
-            inputRef={firstNameRef}
-            errorText={actionData?.errors?.firstName}
-          />
-          <InputField
-            id="lastName"
-            label="Last Name"
-            required
-            inputRef={lastNameRef}
-            errorText={actionData?.errors?.lastName}
-          />
-          <InputField
-            id="email"
-            label="Email address"
-            required
-            inputRef={emailRef}
-            type="email"
-            errorText={actionData?.errors?.email}
-          />
-          <InputField
-            id="password"
-            label="Password"
-            required
-            inputRef={passwordRef}
-            type="password"
-            errorText={actionData?.errors?.password}
-          />
-          <InputField
-            id="phoneNumber"
-            label="Phone number"
-            required
-            inputRef={phoneNumberRef}
-            type="tel"
-            errorText={actionData?.errors?.password}
-          />
+          <TextField.Root>
+            <TextField.Input name="firstName" placeholder="First Name" ref={firstNameRef} />
+          </TextField.Root>
+          <TextField.Root>
+            <TextField.Input name="lastName" placeholder="Last Name" ref={lastNameRef} />
+          </TextField.Root>
+          <TextField.Root>
+            <TextField.Input name="email" type="email" placeholder="Email address" ref={emailRef} />
+          </TextField.Root>
+          <TextField.Root>
+            <TextField.Input name="password" type="password" placeholder="Password" ref={passwordRef} />
+          </TextField.Root>
+          <TextField.Root>
+            <TextField.Input name="phoneNumber" type="tel" placeholder="Phone number" ref={phoneNumberRef} />
+          </TextField.Root>
           <input type="hidden" name="redirectTo" value={redirectTo} />
           <button
             type="submit"

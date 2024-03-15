@@ -1,9 +1,9 @@
 import { Division, League } from "@prisma/client";
 import { prisma } from "~/db.server";
 
-export function getDivisionTeamsUsersProfileByLeague(league: League) {
+export function getDivisionTeamsUsersProfileByLeagueSlug(slug: League['slug']) {
   return prisma.division.findMany({
-    where: { league },
+    where: { league: { slug } },
     include: {
       league: true,
       teams: {

@@ -39,7 +39,7 @@ export default function Index() {
                     View Notes for {user.email}
                   </Link>
                 ) : (
-                  <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">
+                  <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-3 sm:gap-5 sm:space-y-0">
                     <Link
                       to="/join"
                       className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-base font-medium text-yellow-700 shadow-sm hover:bg-yellow-50 sm:px-8"
@@ -52,16 +52,15 @@ export default function Index() {
                     >
                       Log In
                     </Link>
+                    <Link
+                      to="/courses"
+                      className="flex items-center justify-center rounded-md bg-yellow-800 px-4 py-3 font-medium text-white hover:bg-yellow-600"
+                    >
+                      Courses
+                    </Link>
                   </div>
                 )}
               </div>
-              <a href="https://remix.run">
-                <img
-                  src="https://user-images.githubusercontent.com/1500684/158298926-e45dafff-3544-4b69-96d6-d3bcc33fc76a.svg"
-                  alt="Remix"
-                  className="mx-auto mt-16 w-full max-w-[12rem] md:max-w-[16rem]"
-                />
-              </a>
             </div>
           </div>
         </div>

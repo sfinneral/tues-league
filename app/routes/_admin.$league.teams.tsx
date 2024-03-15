@@ -3,9 +3,9 @@ import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 import invariant from "tiny-invariant";
-import { getDivisionTeamsUsersProfileByLeague } from "~/models/division.server";
+import { getDivisionTeamsUsersProfileByLeagueSlug } from "~/models/division.server";
 import { getLeagueBySlug } from "~/models/league.server";
-import { createTeam, getTeamsUsersByLeague } from "~/models/team.server";
+import { createTeam, getTeamsUsersByLeagueSlug } from "~/models/team.server";
 import { getAllUsers } from "~/models/user.server";
 import { getTeamName } from "~/utils";
 
@@ -25,11 +25,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  const league = await getLeagueBySlug(params.league as string);
-  invariant(league, "league is invalid");
-  const teams = await getTeamsUsersByLeague(league);
+  const leagueSlug = params.league as string;
+  const teams = await getTeamsUsersByLeagueSlug(leagueSlug);
   const users = await getAllUsers();
-  const divisions = await getDivisionTeamsUsersProfileByLeague(league);
+  const divisions = await getDivisionTeamsUsersProfileByLeagueSlug(leagueSlug);
 
   return json({
     divisions,

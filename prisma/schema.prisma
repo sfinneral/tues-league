@@ -57,13 +57,12 @@ model League {
 }
 
 model Division {
-  id         String    @id @default(cuid())
-  name       String
-  teams      Team[]
-  leagueId   String
-  league     League    @relation(fields: [leagueId], references: [id])
-  schedule   Schedule? @relation(fields: [scheduleId], references: [id])
-  scheduleId String?   @unique
+  id       String    @id @default(cuid())
+  name     String
+  teams    Team[]
+  leagueId String
+  league   League    @relation(fields: [leagueId], references: [id])
+  schedule Schedule?
 }
 
 model Team {
@@ -80,7 +79,6 @@ model Team {
 
 model Match {
   id     String  @id @default(cuid())
-  date   String
   scores Score[]
   teams  Team[]
   Week   Week?   @relation(fields: [weekId], references: [id])
@@ -98,9 +96,10 @@ model Score {
 }
 
 model Schedule {
-  id       String    @id @default(cuid())
-  weeks    Week[]
-  division Division?
+  id         String   @id @default(cuid())
+  weeks      Week[]
+  divisionId String   @unique
+  division   Division @relation(fields: [divisionId], references: [id])
 
   league   League @relation(fields: [leagueId], references: [id])
   leagueId String
