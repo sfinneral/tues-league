@@ -3,7 +3,7 @@ import { ReactElement } from "react";
 
 interface InlineErrorProps {
   children: ReactElement | string;
-};
+}
 
 export default function InlineError({ children }: InlineErrorProps) {
   return (

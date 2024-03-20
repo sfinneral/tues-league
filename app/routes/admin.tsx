@@ -1,7 +1,5 @@
-import { redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
-
-import type { LoaderFunctionArgs } from "@remix-run/node";
 import TopBanner from "~/components/TopBanner";
 import { getUserById } from "~/models/user.server";
 import { requireUserId } from "~/session.server";

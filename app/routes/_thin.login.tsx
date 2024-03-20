@@ -102,9 +102,9 @@ export default function LoginPage() {
             ref={emailRef}
           />
         </TextField.Root>
-        {actionData?.errors?.email && (
+        {actionData?.errors?.email ? (
           <InlineError>{actionData.errors.email}</InlineError>
-        )}
+        ) : null}
         <TextField.Root className="mt-4">
           <TextField.Input
             name="password"
@@ -113,9 +113,9 @@ export default function LoginPage() {
             ref={passwordRef}
           />
         </TextField.Root>
-        {actionData?.errors?.password && (
+        {actionData?.errors?.password ? (
           <InlineError>{actionData.errors.password}</InlineError>
-        )}
+        ) : null}
 
         <input type="hidden" name="redirectTo" value={redirectTo} />
         <Button type="submit" className="w-full" my="4">

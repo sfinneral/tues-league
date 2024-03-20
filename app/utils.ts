@@ -86,6 +86,7 @@ export function getTeamName(team: any): string {
   }, "");
 }
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export function shuffle(array: any[]) {
   let currentIndex = array.length,
     randomIndex;

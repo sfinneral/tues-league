@@ -1,9 +1,8 @@
-import { redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 import TopBanner from "~/components/TopBanner";
-
-import type { LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserId } from "~/session.server";
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await requireUserId(request);
   // to-do

@@ -1,5 +1,9 @@
 import { Button, Flex, Heading, TextField } from "@radix-ui/themes";
-import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
+import {
+  json,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 
 import { Fragment } from "react";
@@ -102,7 +106,7 @@ export default function AdminSchedules() {
                       {match.teams.map((team, index) => (
                         <Fragment key={team.id}>
                           <div>{getTeamName(team)}</div>
-                          {index === 0 && <div>vs</div>}
+                          {index === 0 ? <div>vs</div> : null}
                         </Fragment>
                       ))}
                     </Flex>

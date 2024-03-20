@@ -195,9 +195,9 @@ export default function Join() {
             ref={firstNameRef}
           />
         </TextField.Root>
-        {actionData?.errors?.firstName && (
+        {actionData?.errors?.firstName ? (
           <InlineError>{actionData.errors.firstName}</InlineError>
-        )}
+        ) : null}
         <TextField.Root className="mt-4">
           <TextField.Input
             name="lastName"
@@ -205,9 +205,9 @@ export default function Join() {
             ref={lastNameRef}
           />
         </TextField.Root>
-        {actionData?.errors?.lastName && (
+        {actionData?.errors?.lastName ? (
           <InlineError>{actionData.errors.lastName}</InlineError>
-        )}
+        ) : null}
         <TextField.Root className="mt-4">
           <TextField.Input
             name="email"
@@ -216,9 +216,9 @@ export default function Join() {
             ref={emailRef}
           />
         </TextField.Root>
-        {actionData?.errors?.email && (
+        {actionData?.errors?.email ? (
           <InlineError>{actionData.errors.email}</InlineError>
-        )}
+        ) : null}
         <TextField.Root className="mt-4">
           <TextField.Input
             name="password"
@@ -227,9 +227,9 @@ export default function Join() {
             ref={passwordRef}
           />
         </TextField.Root>
-        {actionData?.errors?.password && (
+        {actionData?.errors?.password ? (
           <InlineError>{actionData.errors.password}</InlineError>
-        )}
+        ) : null}
         <TextField.Root className="mt-4">
           <TextField.Input
             name="phoneNumber"
@@ -238,9 +238,9 @@ export default function Join() {
             ref={phoneNumberRef}
           />
         </TextField.Root>
-        {actionData?.errors?.phoneNumber && (
+        {actionData?.errors?.phoneNumber ? (
           <InlineError>{actionData.errors.phoneNumber}</InlineError>
-        )}
+        ) : null}
         <input type="hidden" name="redirectTo" value={redirectTo} />
         <Button type="submit" className="w-full" my="4">
           Create Account
