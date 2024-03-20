@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -130,32 +129,32 @@ const password = "!JohnVal13!";
 const phoneNumber = "555-555-6666";
 
 async function seed() {
-  users.forEach(async (user) => {
-    const { email, firstName, lastName } = user;
-    // cleanup the existing database
-    await prisma.user.delete({ where: { email } }).catch((error) => {
-      // no worries if it doesn't exist yet
-      console.log(error, "error deleting existing users");
-    });
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await prisma.user.create({
-      data: {
-        email,
-        password: {
-          create: {
-            hash: hashedPassword,
-          },
-        },
-        profile: {
-          create: {
-            phoneNumber,
-            firstName,
-            lastName,
-          },
-        },
-      },
-    });
-  });
+  // users.forEach(async (user) => {
+  //   const { email, firstName, lastName } = user;
+  //   // cleanup the existing database
+  //   await prisma.user.delete({ where: { email } }).catch((error) => {
+  //     // no worries if it doesn't exist yet
+  //     console.log(error, "error deleting existing users");
+  //   });
+  //   const hashedPassword = await bcrypt.hash(password, 10);
+  //   await prisma.user.create({
+  //     data: {
+  //       email,
+  //       password: {
+  //         create: {
+  //           hash: hashedPassword,
+  //         },
+  //       },
+  //       profile: {
+  //         create: {
+  //           phoneNumber,
+  //           firstName,
+  //           lastName,
+  //         },
+  //       },
+  //     },
+  //   });
+  // });
 
   console.log(`Database has been seeded with users. 🌱`);
 }

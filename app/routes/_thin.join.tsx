@@ -1,4 +1,10 @@
-import { TextField } from "@radix-ui/themes";
+import {
+  Button,
+  Heading,
+  Link as StyledLink,
+  Text,
+  TextField,
+} from "@radix-ui/themes";
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -7,6 +13,7 @@ import type {
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import { useEffect, useRef } from "react";
+import InlineError from "~/components/InlineError";
 
 import { createUser, getUserByEmail } from "~/models/user.server";
 import { createUserSession, getUserId } from "~/session.server";
@@ -57,21 +64,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
 
-  if (typeof phoneNumber !== "string" || phoneNumber.length === 0) {
-    return json(
-      {
-        errors: {
-          email: null,
-          password: null,
-          lastName: null,
-          firstName: null,
-          phoneNumber: "Phone number is required",
-        },
-      },
-      { status: 400 },
-    );
-  }
-
   if (!validateEmail(email)) {
     return json(
       {
@@ -107,7 +99,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       {
         errors: {
           email: null,
-          password: "Password is too short",
+          password: "Password is too short. Needs to be at least 8 characters",
           firstName: null,
           lastName: null,
           phoneNumber: null,
@@ -126,6 +118,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           password: null,
           firstName: null,
           lastName: null,
+          phoneNumber: null,
+        },
+      },
+      { status: 400 },
+    );
+  }
+
+  if (typeof phoneNumber !== "string" || phoneNumber.length === 0) {
+    return json(
+      {
+        errors: {
+          email: null,
+          password: null,
+          lastName: null,
+          firstName: null,
+          phoneNumber: "Phone number is required",
         },
       },
       { status: 400 },
@@ -169,51 +177,87 @@ export default function Join() {
       firstNameRef.current?.focus();
     } else if (actionData?.errors?.lastName) {
       lastNameRef.current?.focus();
+    } else if (actionData?.errors?.phoneNumber) {
+      phoneNumberRef.current?.focus();
     }
   }, [actionData]);
 
   return (
-    <div className="flex min-h-full flex-col justify-center">
-      <div className="mx-auto w-full max-w-md px-8">
-        <Form method="post" className="space-y-6">
-          <TextField.Root>
-            <TextField.Input name="firstName" placeholder="First Name" ref={firstNameRef} />
-          </TextField.Root>
-          <TextField.Root>
-            <TextField.Input name="lastName" placeholder="Last Name" ref={lastNameRef} />
-          </TextField.Root>
-          <TextField.Root>
-            <TextField.Input name="email" type="email" placeholder="Email address" ref={emailRef} />
-          </TextField.Root>
-          <TextField.Root>
-            <TextField.Input name="password" type="password" placeholder="Password" ref={passwordRef} />
-          </TextField.Root>
-          <TextField.Root>
-            <TextField.Input name="phoneNumber" type="tel" placeholder="Phone number" ref={phoneNumberRef} />
-          </TextField.Root>
-          <input type="hidden" name="redirectTo" value={redirectTo} />
-          <button
-            type="submit"
-            className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
+    <>
+      <Heading size="6" my="6">
+        Golf League Sign Up
+      </Heading>
+      <Form method="post">
+        <TextField.Root className="mt-4">
+          <TextField.Input
+            name="firstName"
+            placeholder="First Name"
+            ref={firstNameRef}
+          />
+        </TextField.Root>
+        {actionData?.errors?.firstName && (
+          <InlineError>{actionData.errors.firstName}</InlineError>
+        )}
+        <TextField.Root className="mt-4">
+          <TextField.Input
+            name="lastName"
+            placeholder="Last Name"
+            ref={lastNameRef}
+          />
+        </TextField.Root>
+        {actionData?.errors?.lastName && (
+          <InlineError>{actionData.errors.lastName}</InlineError>
+        )}
+        <TextField.Root className="mt-4">
+          <TextField.Input
+            name="email"
+            type="email"
+            placeholder="Email address"
+            ref={emailRef}
+          />
+        </TextField.Root>
+        {actionData?.errors?.email && (
+          <InlineError>{actionData.errors.email}</InlineError>
+        )}
+        <TextField.Root className="mt-4">
+          <TextField.Input
+            name="password"
+            type="password"
+            placeholder="Password"
+            ref={passwordRef}
+          />
+        </TextField.Root>
+        {actionData?.errors?.password && (
+          <InlineError>{actionData.errors.password}</InlineError>
+        )}
+        <TextField.Root className="mt-4">
+          <TextField.Input
+            name="phoneNumber"
+            type="tel"
+            placeholder="Phone number"
+            ref={phoneNumberRef}
+          />
+        </TextField.Root>
+        {actionData?.errors?.phoneNumber && (
+          <InlineError>{actionData.errors.phoneNumber}</InlineError>
+        )}
+        <input type="hidden" name="redirectTo" value={redirectTo} />
+        <Button type="submit" className="w-full" my="4">
+          Create Account
+        </Button>
+
+        <Text size="2" as="p" color="gray" align="center">
+          Already have an account?{" "}
+          <Link
+            to={{
+              pathname: "/login",
+              search: searchParams.toString(),
+            }}
           >
-            Create Account
-          </button>
-          <div className="flex items-center justify-center">
-            <div className="text-center text-sm text-gray-500">
-              Already have an account?{" "}
-              <Link
-                className="text-blue-500 underline"
-                to={{
-                  pathname: "/login",
-                  search: searchParams.toString(),
-                }}
-              >
-                Log in
-              </Link>
-            </div>
-          </div>
-        </Form>
-      </div>
-    </div>
+            <StyledLink>Log in</StyledLink>
+          </Link>
+        </Text>
+      </Form>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { Division, League } from "@prisma/client";
 import { prisma } from "~/db.server";
 
-export function getDivisionTeamsUsersProfileByLeagueSlug(slug: League['slug']) {
+export function getDivisionTeamsUsersProfileByLeagueSlug(slug: League["slug"]) {
   return prisma.division.findMany({
     where: { league: { slug } },
     include: {
@@ -19,13 +19,13 @@ export function getDivisionTeamsUsersProfileByLeagueSlug(slug: League['slug']) {
   });
 }
 
-export function getDivisionseByLeagueSlug(slug: League['slug']) {
+export function getDivisionseByLeagueSlug(slug: League["slug"]) {
   return prisma.division.findMany({
     where: { league: { slug } },
     include: {
-      schedule: true
-    }
-  })
+      schedule: true,
+    },
+  });
 }
 
 export function getDivisionsByLeague(league: League) {

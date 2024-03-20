@@ -49,13 +49,13 @@ export default function AdminLeagues() {
           {leagues.map((league) => (
             <Flex gap="3" key={league.id}>
               <div className="w-60">{league.name}</div>
-              <Link to={`/${league.slug}/divisions`}>
+              <Link to={`/admin/${league.slug}/divisions`}>
                 <Button variant="surface">divisions</Button>
               </Link>
-              <Link to={`/${league.slug}/teams`}>
+              <Link to={`/admin/${league.slug}/teams`}>
                 <Button variant="surface">teams</Button>
               </Link>
-              <Link to={`/${league.slug}/schedules`}>
+              <Link to={`/admin/${league.slug}/schedules`}>
                 <Button variant="surface">schedules</Button>
               </Link>
             </Flex>

@@ -39,14 +39,12 @@ export default function AdminCourses() {
       <Form method="post" ref={formRef}>
         <div>
           {courses.map((course) => (
-            <div className="flex my-3" key={course.id}>
-              <div className="w-60">
-                {course.name}
-              </div>
-              <Link to={`/${course.slug}/leagues`}>
+            <Flex my="3" key={course.id}>
+              <div className="w-60">{course.name}</div>
+              <Link to={`/admin/${course.slug}/leagues`}>
                 <Button variant="surface">leagues</Button>
               </Link>
-            </div>
+            </Flex>
           ))}
         </div>
         <Flex py="3">

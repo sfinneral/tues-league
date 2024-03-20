@@ -1,7 +1,6 @@
 import type { Division, League, User } from "@prisma/client";
 import { prisma } from "~/db.server";
 
-
 export function getTeamsByLeagueSlug(slug: League["slug"]) {
   return (
     prisma.league.findFirst({
@@ -15,10 +14,10 @@ export function getTeamsByLeagueSlug(slug: League["slug"]) {
   );
 }
 
-export function getTeamsByDivisionId(divisionId: Division['id']) {
+export function getTeamsByDivisionId(divisionId: Division["id"]) {
   return prisma.team.findMany({
     where: {
-      divisionId
+      divisionId,
     },
     include: {
       users: true,
@@ -26,12 +25,12 @@ export function getTeamsByDivisionId(divisionId: Division['id']) {
   });
 }
 
-export function getTeamsUsersByLeagueSlug(slug: League['slug']) {
+export function getTeamsUsersByLeagueSlug(slug: League["slug"]) {
   return prisma.team.findMany({
     where: {
       league: {
-        slug
-      }
+        slug,
+      },
     },
     include: {
       users: true,

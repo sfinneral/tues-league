@@ -78,3 +78,21 @@ export async function verifyLogin(
 
   return userWithoutPassword;
 }
+
+export async function getLeagueSlugByUserId(id: User["id"]) {
+  const user = await prisma.user.findFirst({
+    where: { id },
+    select: {
+      teams: {
+        select: {
+          league: {
+            select: {
+              slug: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  return user?.teams[0]?.league.slug;
+}
