@@ -123,6 +123,7 @@ jobs:
 
       - name: 👀 Read app name
         uses: SebRollen/toml-action@v1.0.2
+        runs: 'node20'
         id: app_name
         with:
           file: fly.toml
