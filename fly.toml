@@ -1,4 +1,5 @@
 app = "tues-league-bf86"
+primary_region="bos"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]
