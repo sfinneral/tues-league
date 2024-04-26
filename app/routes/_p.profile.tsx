@@ -1,10 +1,10 @@
-import { Button, Flex, Heading, Text, TextField } from "@radix-ui/themes";
+import { Button, Flex, Heading, Separator, Text, TextField } from "@radix-ui/themes";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, json, redirect, useLoaderData } from "@remix-run/react";
+import { Form, Link, json, redirect, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
-import { getUserById, updateUser } from "~/models/user.server";
+import { getLeagueSlugByUserId, getUserById, updateUser } from "~/models/user.server";
 import { getUserId } from "~/session.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -27,12 +27,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await getUserId(request);
   if (userId) {
     const user = await getUserById(userId);
-    return json({ user });
+    const isAdmin = user && process.env.ADMIN_EMAILS?.includes(user.email)
+    const leagueSlug = await getLeagueSlugByUserId(userId)
+    return json({ user, isAdmin, leagueSlug });
   }
 }
 
 export default function Profile() {
-  const { user } = useLoaderData<typeof loader>();
+  const { user, isAdmin, leagueSlug } = useLoaderData<typeof loader>();
   const [isUpdating, setIsUpdating] = useState(false);
   const [firstName, setFirstName] = useState(
     user?.profile?.firstName || undefined,
@@ -112,6 +114,15 @@ export default function Profile() {
           </Flex>
         </Flex>
       )}
+      {isAdmin &&
+        <div>
+          <Separator my="6" size="4" />
+          <Flex direction='column'>
+            <Heading size='2' mb='4'>Admin Links</Heading>
+            <Link to={`/admin/${leagueSlug}/matches`}><Button>Enter Scores</Button></Link>
+          </Flex>
+        </div>
+      }
     </div>
   );
 }
