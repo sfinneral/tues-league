@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, TextField } from "@radix-ui/themes";
+import { Button, Card, Flex, Heading, TextField } from "@radix-ui/themes";
 import {
   json,
   type ActionFunctionArgs,
@@ -55,62 +55,63 @@ export default function AdminSchedules() {
 
   return (
     <div>
-      <Heading>Schedules</Heading>
+      <Heading mb='4'>Schedules</Heading>
+      <Card mb='8'>
+        {divisions.map((division) => (
+          <Form key={division.id} method="post">
+            <Flex gap="3" className="my-3 align-middle">
+              <Heading size="3" className="w-24">
+                {division.name}
+              </Heading>
+              <input type="hidden" name="divisionId" value={division.id} />
+              {!division.schedule ? (
+                <>
+                  <TextField.Root placeholder="# of weeks" name="numberOfWeeks" />
 
-      {divisions.map((division) => (
-        <Form key={division.id} method="post">
-          <Flex gap="3" className="my-3 align-middle">
-            <Heading size="3" className="w-24">
-              {division.name}
-            </Heading>
-            <input type="hidden" name="divisionId" value={division.id} />
-            {!division.schedule ? (
-              <>
-                <TextField.Root placeholder="# of weeks" name="numberOfWeeks" />
-
-                <TextField.Root
-                  placeholder="start date"
-                  type="date"
-                  name="startDate"
-                />
-                <Button type="submit" name="_action" value="create">
-                  generate
+                  <TextField.Root
+                    placeholder="start date"
+                    type="date"
+                    name="startDate"
+                  />
+                  <Button type="submit" name="_action" value="create">
+                    generate
+                  </Button>
+                </>
+              ) : (
+                <Button color="red" name="_action" value="delete" type="submit">
+                  delete schedule
                 </Button>
-              </>
-            ) : (
-              <Button color="red" name="_action" value="delete" type="submit">
-                delete schedule
-              </Button>
-            )}
-          </Flex>
-        </Form>
+              )}
+            </Flex>
+          </Form>
+
+        ))}
+      </Card>
+
+      {schedules.map((schedule) => (
+        <div key={schedule.id}>
+          <Heading size="4">{schedule.division.name}</Heading>
+
+          <div>
+            {schedule.weeks.map((week) => (
+              <div key={week.id} className="my-5">
+                <Heading size="3">{formatDate(week.date)}</Heading>
+                {week.matches.map((match) => (
+                  <Flex key={match.id} gap="2">
+                    {match.teams.map((team, index) => (
+                      <Fragment key={team.id}>
+                        <div>{getTeamName(team)}</div>
+                        {index === 0 ? <div>vs</div> : null}
+                      </Fragment>
+                    ))}
+                  </Flex>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       ))}
 
-      <Flex gap="3">
-        {schedules.map((schedule) => (
-          <div key={schedule.id}>
-            <Heading size="4">{schedule.division.name}</Heading>
-
-            <div>
-              {schedule.weeks.map((week) => (
-                <div key={week.id} className="my-5">
-                  <Heading size="3">{formatDate(week.date)}</Heading>
-                  {week.matches.map((match) => (
-                    <Flex key={match.id} gap="2">
-                      {match.teams.map((team, index) => (
-                        <Fragment key={team.id}>
-                          <div>{getTeamName(team)}</div>
-                          {index === 0 ? <div>vs</div> : null}
-                        </Fragment>
-                      ))}
-                    </Flex>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </Flex>
     </div>
   );
 }

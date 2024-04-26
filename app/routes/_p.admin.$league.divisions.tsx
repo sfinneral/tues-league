@@ -47,17 +47,17 @@ export default function AdminDivisions() {
             </div>
           ))}
         </section>
-        <Flex py="3">
-          <Card>
-            <Heading>Add new Division</Heading>
-            <Flex gap="3" py="3">
-              <TextField.Root name="name" placeholder="division name" />
-              <Button type="submit" variant="solid">
-                save
-              </Button>
-            </Flex>
-          </Card>
-        </Flex>
+
+        <Card mt='4'>
+          <Heading size='2'>Add new Division</Heading>
+          <Flex gap="3" py="3">
+            <TextField.Root name="name" placeholder="division name" />
+            <Button type="submit" variant="solid">
+              save
+            </Button>
+          </Flex>
+        </Card>
+
       </Form>
     </div>
   );

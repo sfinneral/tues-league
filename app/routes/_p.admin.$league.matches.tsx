@@ -1,3 +1,4 @@
+import { Schedule } from "@prisma/client";
 import { Button, Card, Flex, Heading } from "@radix-ui/themes";
 import {
   json,
@@ -34,6 +35,15 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function AdminMatches() {
   const { schedules } = useLoaderData<typeof loader>();
 
+  const startIndex = (scheduleId: Schedule['id']) => {
+    const schedule = schedules.find(schedule => schedule.id === scheduleId)
+    return schedule && schedule.weeks.findIndex(week => {
+      return week.matches.find(match => {
+        return match.scores.find(score => !score.score)
+      })
+    })
+  }
+
   return (
     <div>
       <Heading>Matches</Heading>
@@ -44,27 +54,29 @@ export default function AdminMatches() {
             <Heading size="4" align="center">
               {schedule.division.name}
             </Heading>
-            <Carousel startIndex={0}>
-              {schedule.weeks.map((week) => (
-                <Form method="post" key={week.id}>
-                  <Heading align="center" size="4">
-                    {formatDate(week.date)}
-                  </Heading>
-                  {week.matches.map((match) => (
-                    <Card key={match.id} my="4">
-                      <Flex gap="2" direction="column">
-                        {match.scores.map((score) => (
-                          <UpdateScore key={score.id} match={match} score={score} />
-                        ))}
-                      </Flex>
-                    </Card>
-                  ))}
-                  <Button type="submit" className="w-full">
-                    Save
-                  </Button>
-                </Form>
-              ))}
-            </Carousel>
+            <div className="-mt-5">
+              <Carousel startIndex={startIndex(schedule.id)}>
+                {schedule.weeks.map((week) => (
+                  <Form method="post" key={week.id}>
+                    <Heading align="center" size="4">
+                      {formatDate(week.date)}
+                    </Heading>
+                    {week.matches.map((match) => (
+                      <Card key={match.id} my="4">
+                        <Flex gap="2" direction="column">
+                          {match.scores.map((score) => (
+                            <UpdateScore key={score.id} match={match} score={score} />
+                          ))}
+                        </Flex>
+                      </Card>
+                    ))}
+                    <Button type="submit" className="w-full">
+                      Save
+                    </Button>
+                  </Form>
+                ))}
+              </Carousel>
+            </div>
           </div>
         ))
       ) : (

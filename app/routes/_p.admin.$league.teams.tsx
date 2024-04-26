@@ -69,51 +69,51 @@ export default function AdminTeams() {
           </div>
         ))}
       </Flex>
-      <Flex py="3">
-        <Form method="post" ref={formRef} key={usersWithoutTeam.length}>
-          <Card>
-            <Heading>Add new team</Heading>
-            <Flex gap="3" py="3">
-              <Select.Root name="player1">
-                <Select.Trigger placeholder="select player 1" />
-                <Select.Content>
-                  {usersWithoutTeam.map((user) => (
-                    <Select.Item
-                      key={user.id}
-                      value={user.id}
-                    >{`${user.profile?.firstName} ${user.profile?.lastName}`}</Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Root>
-              <Select.Root name="player2">
-                <Select.Trigger placeholder="select player 2" />
-                <Select.Content>
-                  {usersWithoutTeam.map((user) => (
-                    <Select.Item
-                      key={user.id}
-                      value={user.id}
-                    >{`${user.profile?.firstName} ${user.profile?.lastName}`}</Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Root>
-              <Select.Root name="division">
-                <Select.Trigger placeholder="select division" />
-                <Select.Content>
-                  {divisions.map((division) => (
-                    <Select.Item
-                      key={division.id}
-                      value={division.id}
-                    >{`${division.name}`}</Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Root>
-              <Button type="submit" variant="solid">
-                save
-              </Button>
-            </Flex>
-          </Card>
-        </Form>
-      </Flex>
+
+      <Form method="post" ref={formRef} key={usersWithoutTeam.length}>
+        <Card>
+          <Heading>Add new team</Heading>
+          <Flex gap="3" py="3" direction='column'>
+            <Select.Root name="player1">
+              <Select.Trigger placeholder="select player 1" />
+              <Select.Content>
+                {usersWithoutTeam.map((user) => (
+                  <Select.Item
+                    key={user.id}
+                    value={user.id}
+                  >{`${user.profile?.firstName} ${user.profile?.lastName}`}</Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+            <Select.Root name="player2">
+              <Select.Trigger placeholder="select player 2" />
+              <Select.Content>
+                {usersWithoutTeam.map((user) => (
+                  <Select.Item
+                    key={user.id}
+                    value={user.id}
+                  >{`${user.profile?.firstName} ${user.profile?.lastName}`}</Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+            <Select.Root name="division">
+              <Select.Trigger placeholder="select division" />
+              <Select.Content>
+                {divisions.map((division) => (
+                  <Select.Item
+                    key={division.id}
+                    value={division.id}
+                  >{`${division.name}`}</Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+            <Button type="submit" variant="solid">
+              save
+            </Button>
+          </Flex>
+        </Card>
+      </Form>
+
     </div>
   );
 }

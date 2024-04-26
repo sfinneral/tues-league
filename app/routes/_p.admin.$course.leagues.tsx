@@ -1,4 +1,4 @@
-import { Button, Card, Flex, Heading, TextField } from "@radix-ui/themes";
+import { Button, Card, Flex, Heading, Text, TextField } from "@radix-ui/themes";
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
@@ -47,37 +47,39 @@ export default function AdminLeagues() {
       <Form method="post" ref={formRef}>
         <section>
           {leagues.map((league) => (
-            <Flex gap="3" key={league.id}>
-              <div className="w-60">{league.name}</div>
-              <Link to={`/admin/${league.slug}/divisions`}>
-                <Button variant="surface">divisions</Button>
-              </Link>
-              <Link to={`/admin/${league.slug}/teams`}>
-                <Button variant="surface">teams</Button>
-              </Link>
-              <Link to={`/admin/${league.slug}/schedules`}>
-                <Button variant="surface">schedules</Button>
-              </Link>
+            <Flex gap="3" direction='column' key={league.id} mb='4'>
+              <Text>{league.name}</Text>
+              <Flex gap='2'>
+                <Link to={`/admin/${league.slug}/divisions`}>
+                  <Button variant="surface">divisions</Button>
+                </Link>
+                <Link to={`/admin/${league.slug}/teams`}>
+                  <Button variant="surface">teams</Button>
+                </Link>
+                <Link to={`/admin/${league.slug}/schedules`}>
+                  <Button variant="surface">schedules</Button>
+                </Link>
+              </Flex>
             </Flex>
           ))}
         </section>
-        <Flex py="3">
-          <Card>
-            <Heading>Add new league</Heading>
-            <Flex gap="3" py="3">
-              <TextField.Root name="name" placeholder="league name" />
-              <TextField.Root name="slug" placeholder="league slug" />
-              <TextField.Root
-                name="startDate"
-                placeholder="start date"
-                type="date"
-              />
-              <Button type="submit" variant="solid">
-                save
-              </Button>
-            </Flex>
-          </Card>
-        </Flex>
+
+        <Card mt='10'>
+          <Heading size='2'>Add new league</Heading>
+          <Flex gap="3" py="3" direction='column'>
+            <TextField.Root name="name" placeholder="league name" />
+            <TextField.Root name="slug" placeholder="league slug" />
+            <TextField.Root
+              name="startDate"
+              placeholder="start date"
+              type="date"
+            />
+            <Button type="submit" variant="solid">
+              save
+            </Button>
+          </Flex>
+        </Card>
+
       </Form>
     </div>
   );
