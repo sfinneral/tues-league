@@ -1,5 +1,10 @@
-import { Team, Week } from "@prisma/client";
+import { Match, Score, Team, Week } from "@prisma/client";
 import { prisma } from "~/db.server";
+
+export interface MatchWithScoresAndTeams extends Match {
+  scores: Score[];
+  teams: Team[];
+}
 
 export function createMatch(
   weekId: Week["id"],
@@ -18,6 +23,9 @@ export function createMatch(
             id: team2Id,
           },
         ],
+      },
+      scores: {
+        create: [{ teamId: team1Id }, { teamId: team2Id }],
       },
     },
   });

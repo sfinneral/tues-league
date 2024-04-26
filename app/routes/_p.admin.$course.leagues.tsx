@@ -65,19 +65,13 @@ export default function AdminLeagues() {
           <Card>
             <Heading>Add new league</Heading>
             <Flex gap="3" py="3">
-              <TextField.Root>
-                <TextField.Input name="name" placeholder="league name" />
-              </TextField.Root>
-              <TextField.Root>
-                <TextField.Input name="slug" placeholder="league slug" />
-              </TextField.Root>
-              <TextField.Root>
-                <TextField.Input
-                  name="startDate"
-                  placeholder="start date"
-                  type="date"
-                />
-              </TextField.Root>
+              <TextField.Root name="name" placeholder="league name" />
+              <TextField.Root name="slug" placeholder="league slug" />
+              <TextField.Root
+                name="startDate"
+                placeholder="start date"
+                type="date"
+              />
               <Button type="submit" variant="solid">
                 save
               </Button>

@@ -67,6 +67,7 @@ export async function getSchedulesByLeagueSlug(slug: League["slug"]) {
         include: {
           matches: {
             include: {
+              scores: true,
               teams: {
                 include: {
                   users: {

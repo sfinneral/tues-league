@@ -51,9 +51,7 @@ export default function AdminDivisions() {
           <Card>
             <Heading>Add new Division</Heading>
             <Flex gap="3" py="3">
-              <TextField.Root>
-                <TextField.Input name="name" placeholder="division name" />
-              </TextField.Root>
+              <TextField.Root name="name" placeholder="division name" />
               <Button type="submit" variant="solid">
                 save
               </Button>

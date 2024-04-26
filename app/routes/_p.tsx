@@ -1,26 +1,63 @@
-import { LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { Outlet } from "@remix-run/react";
+import { Flex, TabNav } from "@radix-ui/themes";
+import { LoaderFunctionArgs, json, redirect } from "@remix-run/node";
+import { Outlet, useLoaderData, useLocation } from "@remix-run/react";
 import TopBanner from "~/components/TopBanner";
+import { getLeagueSlugByUserId, getUserById } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const userId = await requireUserId(request);
   // to-do
   // check if the user is a member of this league
   if (userId) {
-    return null;
+    const user = await getUserById(userId);
+    return json({
+      user,
+      leagueSlug: params.league || (await getLeagueSlugByUserId(userId)),
+    });
   } else {
     return redirect("/login");
   }
 }
 
 export default function ProtectedWrapper() {
+  const { leagueSlug, user } = useLoaderData<typeof loader>();
+  const location = useLocation();
+
+  const navItems = [
+    {
+      text: "Schedule & Scores",
+      href: `/${leagueSlug}`,
+    },
+    {
+      text: "Standings",
+      href: `/${leagueSlug}/standings`,
+    },
+    {
+      text: "Members",
+      href: `/${leagueSlug}/members`,
+    },
+  ];
   return (
-    <div>
-      <TopBanner />
-      <div className="mx-8">
-        <Outlet />
+    <Flex justify="center">
+      <div className="h-full max-w-96">
+        {user?.profile?.firstName ? <TopBanner firstName={user.profile?.firstName} /> : null}
+
+        <TabNav.Root m="3">
+          {navItems.map((navItem) => (
+            <TabNav.Link
+              key={navItem.text}
+              href={navItem.href}
+              active={location.pathname === navItem.href}
+            >
+              {navItem.text}
+            </TabNav.Link>
+          ))}
+        </TabNav.Root>
+        <main className="p-4">
+          <Outlet />
+        </main>
       </div>
-    </div>
+    </Flex>
   );
 }

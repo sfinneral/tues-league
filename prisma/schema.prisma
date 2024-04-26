@@ -87,7 +87,7 @@ model Match {
 
 model Score {
   id    String @id @default(cuid())
-  score Int
+  score Int?
 
   teamId  String
   team    Team   @relation(fields: [teamId], references: [id])

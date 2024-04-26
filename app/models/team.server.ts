@@ -1,5 +1,10 @@
-import type { Division, League, User } from "@prisma/client";
+import type { Division, League, Team, User } from "@prisma/client";
 import { prisma } from "~/db.server";
+import { UserWithProfile } from "./user.server";
+
+export interface TeamWithUsers extends Team {
+  users: UserWithProfile[];
+}
 
 export function getTeamsByLeagueSlug(slug: League["slug"]) {
   return (

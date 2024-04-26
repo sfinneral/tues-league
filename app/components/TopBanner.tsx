@@ -1,14 +1,21 @@
+import { Profile } from "@prisma/client";
+import { PersonIcon } from "@radix-ui/react-icons";
 import { Button, Flex } from "@radix-ui/themes";
-import { Form } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 
-export default function TopBanner() {
+interface TopBannerProps {
+  firstName: Profile["firstName"];
+}
+
+export default function TopBanner({ firstName }: TopBannerProps) {
   return (
-    <nav>
-      <Flex justify="end" p="3">
-        <Form action="/logout" method="post">
-          <Button type="submit">Logout</Button>
-        </Form>
-      </Flex>
-    </nav>
+    <Flex justify="end" p="3">
+      <Link to="/profile">
+        <Button>
+          <PersonIcon />
+          {firstName}
+        </Button>
+      </Link>
+    </Flex>
   );
 }

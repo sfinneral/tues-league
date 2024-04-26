@@ -1,12 +1,23 @@
-import type { Password, User } from "@prisma/client";
+import type { League, Password, Profile, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "~/db.server";
+import { getUserId } from "~/session.server";
+import { getLeagueIdBySlug } from "./league.server";
 
 export type { User } from "@prisma/client";
 
+export interface UserWithProfile extends User {
+  profile: Profile;
+}
+
 export async function getUserById(id: User["id"]) {
-  return prisma.user.findUnique({ where: { id } });
+  return prisma.user.findUnique({
+    where: { id },
+    include: {
+      profile: true,
+    },
+  });
 }
 
 export async function getUserByEmail(email: User["email"]) {
@@ -95,4 +106,54 @@ export async function getLeagueSlugByUserId(id: User["id"]) {
     },
   });
   return user?.teams[0]?.league.slug;
+}
+
+export async function updateUser(
+  id: User["id"],
+  email: User["email"],
+  firstName: Profile["firstName"],
+  lastName: Profile["lastName"],
+  phoneNumber: Profile["phoneNumber"],
+) {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      email,
+      profile: {
+        update: {
+          firstName,
+          lastName,
+          phoneNumber,
+        },
+      },
+    },
+  });
+}
+
+export async function getUsersTeams(
+  request: Request,
+  leagueSlug: League["slug"],
+) {
+  const userId = await getUserId(request);
+  const user = await prisma.user.findFirst({
+    where: {
+      id: userId,
+    },
+    select: {
+      teams: {
+        include: {
+          users: {
+            include: {
+              profile: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  const league = await getLeagueIdBySlug(leagueSlug);
+
+  return user && league
+    ? user.teams.find((team) => team.leagueId === league.id)
+    : null;
 }

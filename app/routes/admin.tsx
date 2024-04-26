@@ -1,6 +1,5 @@
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
-import TopBanner from "~/components/TopBanner";
 import { getUserById } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -16,7 +15,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function AdminWrapper() {
   return (
     <main>
-      <TopBanner />
       <div className="mx-8">
         <Outlet />
       </div>

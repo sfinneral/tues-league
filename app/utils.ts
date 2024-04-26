@@ -1,7 +1,9 @@
+import { Team } from "@prisma/client";
 import { useMatches } from "@remix-run/react";
 import { useMemo } from "react";
 
 import type { User } from "~/models/user.server";
+import { MatchWithScoresAndTeams } from "./models/match.server";
 
 const DEFAULT_REDIRECT = "/";
 
@@ -112,3 +114,11 @@ export function formatDate(dateString: string) {
     dateStyle: "full",
   }).format(new Date(dateString));
 }
+
+export const getTeamNameByMatch = (
+  match: MatchWithScoresAndTeams,
+  teamId: Team["id"],
+) => {
+  const team = match.teams.find((team) => team.id === teamId);
+  return getTeamName(team);
+};

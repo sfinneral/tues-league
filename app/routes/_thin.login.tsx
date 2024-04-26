@@ -47,13 +47,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
 
-  if (password.length < 8) {
-    return json(
-      { errors: { email: null, password: "Password is too short" } },
-      { status: 400 },
-    );
-  }
-
   const user = await verifyLogin(email, password);
 
   if (!user) {
@@ -94,25 +87,23 @@ export default function LoginPage() {
         Golf League Login
       </Heading>
       <Form method="post">
-        <TextField.Root className="mt-4">
-          <TextField.Input
-            name="email"
-            type="email"
-            placeholder="Email address"
-            ref={emailRef}
-          />
-        </TextField.Root>
+        <TextField.Root
+          className="mt-4"
+          name="email"
+          type="email"
+          placeholder="Email address"
+          ref={emailRef}
+        />
         {actionData?.errors?.email ? (
           <InlineError>{actionData.errors.email}</InlineError>
         ) : null}
-        <TextField.Root className="mt-4">
-          <TextField.Input
-            name="password"
-            type="password"
-            placeholder="Password"
-            ref={passwordRef}
-          />
-        </TextField.Root>
+        <TextField.Root
+          className="mt-4"
+          name="password"
+          type="password"
+          placeholder="Password"
+          ref={passwordRef}
+        />
         {actionData?.errors?.password ? (
           <InlineError>{actionData.errors.password}</InlineError>
         ) : null}

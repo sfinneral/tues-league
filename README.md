@@ -1,6 +1,18 @@
-# Remix Indie Stack
+## .env variables
 
-![The Remix Indie Stack](https://repository-images.githubusercontent.com/465928257/a241fa49-bd4d-485a-a2a5-5cb8e4ee0abf)
+stored in https://fly.io/apps/tues-league-bf86/secrets
+
+## connect to server
+
+`fly ssh console -a tues-league-bf86`
+`fly ssh console -a tues-league-bf86-staging`
+
+## database schema not updating
+
+Might need to manually push db changes
+connect to server then `npx prisma db push`
+
+# Built with Remix Indie Stack
 
 Learn more about [Remix Stacks](https://remix.run/stacks).
 

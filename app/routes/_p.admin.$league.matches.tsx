@@ -1,10 +1,26 @@
-import { Card, Flex, Heading } from "@radix-ui/themes";
-import { LoaderFunctionArgs, json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Button, Card, Flex, Heading } from "@radix-ui/themes";
+import {
+  json,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
+
 import Carousel from "~/components/Carousel";
-import { WeekResults } from "~/components/WeekResults";
+import { UpdateScore } from "~/components/UpdateScore";
 import { getSchedulesByLeagueSlug } from "~/models/schedule.server";
-import { formatDate, getTeamNameByMatch } from "~/utils";
+import { updateScore } from "~/models/score.server";
+import { formatDate } from "~/utils";
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+
+  for (const entry of formData.entries()) {
+    await updateScore(entry[0], Number(entry[1]));
+  }
+
+  return {};
+}
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const leagueSlug = params.league as string;
@@ -15,10 +31,13 @@ export async function loader({ params }: LoaderFunctionArgs) {
   });
 }
 
-export default function LeagueHome() {
+export default function AdminMatches() {
   const { schedules } = useLoaderData<typeof loader>();
+
   return (
     <div>
+      <Heading>Matches</Heading>
+
       {schedules?.length ? (
         schedules.map((schedule) => (
           <div key={schedule.id} className="mb-4">
@@ -27,24 +46,23 @@ export default function LeagueHome() {
             </Heading>
             <Carousel startIndex={0}>
               {schedule.weeks.map((week) => (
-                <div key={week.id}>
-                  <Heading align="center" size="2">
+                <Form method="post" key={week.id}>
+                  <Heading align="center" size="4">
                     {formatDate(week.date)}
                   </Heading>
                   {week.matches.map((match) => (
                     <Card key={match.id} my="4">
                       <Flex gap="2" direction="column">
                         {match.scores.map((score) => (
-                          <Flex key={score.id} justify="between" align="center">
-                            <div>{getTeamNameByMatch(match, score.teamId)}</div>
-                            <div>{score.score}</div>
-                          </Flex>
+                          <UpdateScore key={score.id} match={match} score={score} />
                         ))}
                       </Flex>
                     </Card>
                   ))}
-                  <WeekResults matches={week.matches} />
-                </div>
+                  <Button type="submit" className="w-full">
+                    Save
+                  </Button>
+                </Form>
               ))}
             </Carousel>
           </div>

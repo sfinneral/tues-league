@@ -1,5 +1,6 @@
 import {
   Button,
+  Flex,
   Heading,
   Link as StyledLink,
   Text,
@@ -21,8 +22,10 @@ import { safeRedirect, validateEmail } from "~/utils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request);
-  if (userId) return redirect("/");
-  return json({});
+  if (userId) {
+    return redirect("/");
+  }
+  return null;
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -94,12 +97,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
 
-  if (password.length < 8) {
+  if (password.length < 5) {
     return json(
       {
         errors: {
           email: null,
-          password: "Password is too short. Needs to be at least 8 characters",
+          password: "Password is too short. Needs to be at least 5 characters",
           firstName: null,
           lastName: null,
           phoneNumber: null,
@@ -188,75 +191,72 @@ export default function Join() {
         Golf League Sign Up
       </Heading>
       <Form method="post">
-        <TextField.Root className="mt-4">
-          <TextField.Input
-            name="firstName"
-            placeholder="First Name"
-            ref={firstNameRef}
-          />
-        </TextField.Root>
+        <TextField.Root
+          className="mt-4"
+          name="firstName"
+          placeholder="First Name"
+          ref={firstNameRef}
+        />
         {actionData?.errors?.firstName ? (
           <InlineError>{actionData.errors.firstName}</InlineError>
         ) : null}
-        <TextField.Root className="mt-4">
-          <TextField.Input
-            name="lastName"
-            placeholder="Last Name"
-            ref={lastNameRef}
-          />
-        </TextField.Root>
+        <TextField.Root
+          className="mt-4"
+          name="lastName"
+          placeholder="Last Name"
+          ref={lastNameRef}
+        />
         {actionData?.errors?.lastName ? (
           <InlineError>{actionData.errors.lastName}</InlineError>
         ) : null}
-        <TextField.Root className="mt-4">
-          <TextField.Input
-            name="email"
-            type="email"
-            placeholder="Email address"
-            ref={emailRef}
-          />
-        </TextField.Root>
+        <TextField.Root
+          className="mt-4"
+          name="email"
+          type="email"
+          placeholder="Email address"
+          ref={emailRef}
+        />
         {actionData?.errors?.email ? (
           <InlineError>{actionData.errors.email}</InlineError>
         ) : null}
-        <TextField.Root className="mt-4">
-          <TextField.Input
-            name="password"
-            type="password"
-            placeholder="Password"
-            ref={passwordRef}
-          />
-        </TextField.Root>
+        <TextField.Root
+          className="mt-4"
+          name="password"
+          type="password"
+          placeholder="Password"
+          ref={passwordRef}
+        />
         {actionData?.errors?.password ? (
           <InlineError>{actionData.errors.password}</InlineError>
         ) : null}
-        <TextField.Root className="mt-4">
-          <TextField.Input
-            name="phoneNumber"
-            type="tel"
-            placeholder="Phone number"
-            ref={phoneNumberRef}
-          />
-        </TextField.Root>
+        <TextField.Root
+          className="mt-4"
+          name="phoneNumber"
+          type="tel"
+          placeholder="Phone number"
+          ref={phoneNumberRef}
+        />
         {actionData?.errors?.phoneNumber ? (
           <InlineError>{actionData.errors.phoneNumber}</InlineError>
         ) : null}
         <input type="hidden" name="redirectTo" value={redirectTo} />
-        <Button type="submit" className="w-full" my="4">
-          Create Account
-        </Button>
+        <Flex justify="between" align="center">
+          <Button type="submit" className="block w-full" my="4">
+            Create Account
+          </Button>
 
-        <Text size="2" as="p" color="gray" align="center">
-          Already have an account?{" "}
-          <Link
-            to={{
-              pathname: "/login",
-              search: searchParams.toString(),
-            }}
-          >
-            <StyledLink>Log in</StyledLink>
-          </Link>
-        </Text>
+          <Text size="2" as="p" color="gray" align="center">
+            Already have an account?{" "}
+            <Link
+              to={{
+                pathname: "/login",
+                search: searchParams.toString(),
+              }}
+            >
+              <StyledLink>Log in</StyledLink>
+            </Link>
+          </Text>
+        </Flex>
       </Form>
     </>
   );

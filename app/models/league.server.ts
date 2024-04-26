@@ -1,10 +1,19 @@
 import type { Course, League } from "@prisma/client";
 import { prisma } from "~/db.server";
 
-export function getLeagueBySlug(slug: Course["slug"]) {
+export function getLeagueBySlug(slug: League["slug"]) {
   return prisma.league.findFirst({
     where: {
       slug,
+    },
+  });
+}
+
+export function getLeagueIdBySlug(slug: League["slug"]) {
+  return prisma.league.findFirst({
+    where: { slug },
+    select: {
+      id: true,
     },
   });
 }

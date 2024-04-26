@@ -51,12 +51,8 @@ export default function AdminCourses() {
           <Card>
             <Heading>Add new course</Heading>
             <Flex gap="3" py="3">
-              <TextField.Root>
-                <TextField.Input name="name" placeholder="course name" />
-              </TextField.Root>
-              <TextField.Root>
-                <TextField.Input name="slug" placeholder="course slug" />
-              </TextField.Root>
+              <TextField.Root name="name" placeholder="course name" />
+              <TextField.Root name="slug" placeholder="course slug" />
               <Button type="submit" variant="solid">
                 save
               </Button>

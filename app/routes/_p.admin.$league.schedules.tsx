@@ -66,19 +66,13 @@ export default function AdminSchedules() {
             <input type="hidden" name="divisionId" value={division.id} />
             {!division.schedule ? (
               <>
-                <TextField.Root>
-                  <TextField.Input
-                    placeholder="# of weeks"
-                    name="numberOfWeeks"
-                  />
-                </TextField.Root>
-                <TextField.Root>
-                  <TextField.Input
-                    placeholder="start date"
-                    type="date"
-                    name="startDate"
-                  />
-                </TextField.Root>
+                <TextField.Root placeholder="# of weeks" name="numberOfWeeks" />
+
+                <TextField.Root
+                  placeholder="start date"
+                  type="date"
+                  name="startDate"
+                />
                 <Button type="submit" name="_action" value="create">
                   generate
                 </Button>
