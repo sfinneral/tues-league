@@ -9,6 +9,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const leagueSlug = await getLeagueSlugByUserId(userId);
   if (leagueSlug) {
     return redirect(`/${leagueSlug}`);
+  } else {
+    return null
   }
 }
 
