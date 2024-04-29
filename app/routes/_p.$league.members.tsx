@@ -5,6 +5,7 @@ import { useLoaderData } from "@remix-run/react";
 import { getDivisionTeamsUsersProfileByLeagueSlug } from "~/models/division.server";
 import { TeamWithUsers } from "~/models/team.server";
 import { getUsersTeams } from "~/models/user.server";
+import { formatPhoneNumber } from "~/utils";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const leagueSlug = params.league as string;
@@ -60,7 +61,7 @@ export default function LeagueMembers() {
                           {user.email}
                         </Text>
                         <Text size="1" color="gray">
-                          {user.profile?.phoneNumber}
+                          {formatPhoneNumber(user.profile?.phoneNumber)}
                         </Text>
                       </Flex>
                     </Flex>

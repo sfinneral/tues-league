@@ -2,6 +2,7 @@ import { Heading, Table } from "@radix-ui/themes";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getAllUsers } from "~/models/user.server";
+import { formatPhoneNumber } from "~/utils";
 export async function loader() {
     const users = await getAllUsers();
     users.sort((a, b) => {
@@ -43,7 +44,7 @@ export default function AdminCourses() {
                                 {user.email}
                             </Table.Cell>
                             <Table.Cell>
-                                {user.profile?.phoneNumber}
+                                {formatPhoneNumber(user.profile?.phoneNumber)}
                             </Table.Cell>
                         </Table.Row>
                     ))}

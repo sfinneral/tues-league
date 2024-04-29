@@ -122,3 +122,16 @@ export const getTeamNameByMatch = (
   const team = match.teams.find((team) => team.id === teamId);
   return getTeamName(team);
 };
+
+export const formatPhoneNumber = (phoneNumberString?: string | null) => {
+  if (!phoneNumberString) return ''
+  if (phoneNumberString.split('')[0] === '1') {
+    phoneNumberString = phoneNumberString.substring(1);
+  }
+  const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+  }
+  return phoneNumberString;
+}
