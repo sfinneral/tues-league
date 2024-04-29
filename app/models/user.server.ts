@@ -25,7 +25,7 @@ export async function getUserByEmail(email: User["email"]) {
 }
 
 export async function getAllUsers() {
-  return prisma.user.findMany({ select: { profile: true, id: true } });
+  return prisma.user.findMany({ select: { profile: true, email: true, id: true } });
 }
 
 export async function createUser(
