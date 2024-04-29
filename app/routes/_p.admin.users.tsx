@@ -23,7 +23,7 @@ export default function AdminCourses() {
     return (
         <>
             <Heading size="4" align="center">
-                Users
+                {users.length} Users
             </Heading>
             <Table.Root>
                 <Table.Header>
