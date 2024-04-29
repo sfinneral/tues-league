@@ -114,14 +114,13 @@ export default function Profile() {
           </Flex>
         </Flex>
       )}
-      {isAdmin &&
-        <div>
+      {isAdmin ? <div>
           <Separator my="6" size="4" />
           <Flex direction='column'>
             <Heading size='2' mb='4'>Admin Links</Heading>
             <Link to={`/admin/${leagueSlug}/matches`}><Button>Enter Scores</Button></Link>
           </Flex>
-        </div>
+        </div> : null
       }
     </div>
   );

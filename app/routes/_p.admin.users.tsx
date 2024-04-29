@@ -1,8 +1,8 @@
 import { Heading, Table } from "@radix-ui/themes";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getAllUsers } from "~/models/user.server";
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader() {
     const users = await getAllUsers();
     users.sort((a, b) => {
         const aName = a.profile?.lastName || 'z'
