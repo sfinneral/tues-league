@@ -46,3 +46,9 @@ export function createDivision(name: Division["name"], leagueId: League["id"]) {
     },
   });
 }
+
+export function deleteDivisionById(id: Division['id']) {
+  return prisma.division.delete({
+    where: { id }
+  })
+}
