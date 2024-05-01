@@ -18,7 +18,7 @@ export default function LeagueStandings() {
     <div>
       {leagueStandings ? (
         leagueStandings.map((leagueStanding) => (
-          <div key={leagueStanding.division.id} className="mb-6">
+          <div key={leagueStanding.division.id} className="mb-16">
             <Heading size="4" align="center">
               {leagueStanding.division.name}
             </Heading>

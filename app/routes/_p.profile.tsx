@@ -6,6 +6,7 @@ import { useState } from "react";
 import invariant from "tiny-invariant";
 import { getLeagueSlugByUserId, getUserById, updateUser } from "~/models/user.server";
 import { getUserId } from "~/session.server";
+import { formatPhoneNumber } from "~/utils";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
@@ -100,7 +101,7 @@ export default function Profile() {
           <Text color="gray">
             {email}
             <br />
-            {phoneNumber}
+            {formatPhoneNumber(phoneNumber)}
           </Text>
           <Flex mt="4" justify="between" align="end">
             <Form action="/logout" method="post">
@@ -115,12 +116,12 @@ export default function Profile() {
         </Flex>
       )}
       {isAdmin ? <div>
-          <Separator my="6" size="4" />
-          <Flex direction='column'>
-            <Heading size='2' mb='4'>Admin Links</Heading>
-            <Link to={`/admin/${leagueSlug}/matches`}><Button>Enter Scores</Button></Link>
-          </Flex>
-        </div> : null
+        <Separator my="6" size="4" />
+        <Flex direction='column'>
+          <Heading size='2' mb='4'>Admin Links</Heading>
+          <Link to={`/admin/${leagueSlug}/matches`}><Button>Enter Scores</Button></Link>
+        </Flex>
+      </div> : null
       }
     </div>
   );

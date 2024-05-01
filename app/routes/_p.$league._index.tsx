@@ -32,7 +32,7 @@ export default function LeagueHome() {
     <div>
       {schedules?.length ? (
         schedules.map((schedule) => (
-          <div key={schedule.id} className="mb-4">
+          <div key={schedule.id} className="mb-16">
             <Heading size="4" align="center">
               {schedule.division.name}
             </Heading>
