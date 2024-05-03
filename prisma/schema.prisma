@@ -18,6 +18,7 @@ model User {
   profileId String?
   profile   Profile?
   teams     Team[]
+  Sub       Sub[]
 }
 
 model Password {
@@ -54,6 +55,7 @@ model League {
   divisions Division[]
   schedule  Schedule[]
   teams     Team[]
+  subs      Sub[]
 }
 
 model Division {
@@ -112,4 +114,12 @@ model Week {
   matches      Match[]
   Schedule     Schedule? @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
   scheduleId   String?
+}
+
+model Sub {
+  id       String @id @default(cuid())
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  leagueId String
+  league   League @relation(fields: [leagueId], references: [id], onDelete: Cascade)
 }

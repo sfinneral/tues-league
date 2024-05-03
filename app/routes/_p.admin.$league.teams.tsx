@@ -1,11 +1,12 @@
-import { Pencil2Icon } from "@radix-ui/react-icons";
-import { Button, Card, Flex, Heading, IconButton, Select } from "@radix-ui/themes";
+import { Cross2Icon, Pencil2Icon } from "@radix-ui/react-icons";
+import { Button, Card, Flex, Heading, IconButton, Select, Text } from "@radix-ui/themes";
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import invariant from "tiny-invariant";
 import { getDivisionTeamsUsersProfileByLeagueSlug } from "~/models/division.server";
 import { getLeagueBySlug } from "~/models/league.server";
+import { createSub, deleteSub, getSubsByLeagueSlug } from "~/models/sub.server";
 import { TeamWithUsers, createTeam, getTeamsUsersByLeagueSlug, updateTeamUsers } from "~/models/team.server";
 import { getAllUsers } from "~/models/user.server";
 import { getTeamName } from "~/utils";
@@ -38,6 +39,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return updateTeamUsers(teamId, player1Id, player2Id);
   }
 
+  if (action === 'addSub') {
+    const userId = formData.get("subPlayer") as string;
+    invariant(Boolean(userId), "sub Player is required");
+    if (league) {
+      return createSub(userId, league.id);
+    }
+
+  }
+
+  if (action === 'removeSub') {
+    const subId = formData.get("subId") as string;
+    invariant(Boolean(subId), "subId is required");
+    return deleteSub(subId);
+  }
+
   return null
 
 }
@@ -47,26 +63,30 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const teams = await getTeamsUsersByLeagueSlug(leagueSlug);
   const users = await getAllUsers();
   const divisions = await getDivisionTeamsUsersProfileByLeagueSlug(leagueSlug);
+  const league = await getSubsByLeagueSlug(leagueSlug)
 
   return json({
     divisions,
     users,
     teams,
+    subs: league ? league.subs : []
   });
 }
 
 export default function AdminTeams() {
-  const { users, divisions, teams } = useLoaderData<typeof loader>();
+  const { users, divisions, teams, subs } = useLoaderData<typeof loader>();
   const [isEditing, setIsEditing] = useState(false)
   const [editingTeam, setEditingTeam] = useState<TeamWithUsers>()
   const formRef = useRef<HTMLFormElement>(null);
   const editingFormRef = useRef<HTMLFormElement>(null);
+  const subFormRef = useRef<HTMLFormElement>(null);
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
 
   useEffect(() => {
     formRef.current?.reset();
     editingFormRef.current?.reset();
+    subFormRef.current?.reset();
     setEditingTeam(undefined);
     setIsEditing(false);
   }, [actionData]);
@@ -111,6 +131,20 @@ export default function AdminTeams() {
           </div>
         ))}
       </Flex>
+      {subs && subs.length ?
+        <Flex direction='column' mb='8'>
+          <Heading size='3'>Subs</Heading>
+          {subs.map(sub => (
+            <Form method='post' key={sub.id}>
+              <Flex align='center' gap='2'>
+                <Text>{sub.user.profile?.firstName} {sub.user.profile?.lastName}</Text>
+                <input type="hidden" name="subId" value={sub.id} />
+                <IconButton type="submit" name="_action" value="removeSub" color="red" variant="ghost"><Cross2Icon /></IconButton>
+              </Flex>
+            </Form>
+          ))}
+        </Flex>
+        : null}
       {isEditing && editingTeam ? <Form method="post" ref={editingFormRef} key={navigation.state}>
         <Card>
           <Heading>Edit team users</Heading>
@@ -188,6 +222,29 @@ export default function AdminTeams() {
           </Card>
         </Form>
       }
+      <div className="my-8">
+        <Form method="post" ref={subFormRef} key={usersWithoutTeam.length}>
+          <Card>
+            <Heading>Add new sub</Heading>
+            <Flex gap="3" py="3" direction='column'>
+              <Select.Root name="subPlayer">
+                <Select.Trigger placeholder="select player 1" />
+                <Select.Content>
+                  {usersWithoutTeam.map((user) => (
+                    <Select.Item
+                      key={user.id}
+                      value={user.id}
+                    >{`${user.profile?.firstName} ${user.profile?.lastName}`}</Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+              <Button type="submit" variant="solid" name="_action" value='addSub'>
+                save
+              </Button>
+            </Flex>
+          </Card>
+        </Form>
+      </div>
     </div>
   );
 }
