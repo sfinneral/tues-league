@@ -1,11 +1,12 @@
-import { Button, Card, Flex, Heading, Select } from "@radix-ui/themes";
+import { Pencil2Icon } from "@radix-ui/react-icons";
+import { Button, Card, Flex, Heading, IconButton, Select } from "@radix-ui/themes";
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { useEffect, useRef } from "react";
+import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { useEffect, useRef, useState } from "react";
 import invariant from "tiny-invariant";
 import { getDivisionTeamsUsersProfileByLeagueSlug } from "~/models/division.server";
 import { getLeagueBySlug } from "~/models/league.server";
-import { createTeam, getTeamsUsersByLeagueSlug } from "~/models/team.server";
+import { TeamWithUsers, createTeam, getTeamsUsersByLeagueSlug, updateTeamUsers } from "~/models/team.server";
 import { getAllUsers } from "~/models/user.server";
 import { getTeamName } from "~/utils";
 
@@ -13,15 +14,32 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const league = await getLeagueBySlug(params.league as string);
   invariant(Boolean(league), "league is invalid");
   const formData = await request.formData();
-  const player1Id = formData.get("player1") as string;
-  const player2Id = formData.get("player2") as string;
-  const divisionId = formData.get("division") as string;
+  const action = formData.get("_action") as string;
+  if (action === 'create') {
+    const player1Id = formData.get("player1") as string;
+    const player2Id = formData.get("player2") as string;
+    const divisionId = formData.get("division") as string;
 
-  invariant(Boolean(player1Id), "player 1 is required");
-  invariant(Boolean(player2Id), "player 2 is required");
-  invariant(Boolean(divisionId), "division is required");
+    invariant(Boolean(player1Id), "player 1 is required");
+    invariant(Boolean(player2Id), "player 2 is required");
+    invariant(Boolean(divisionId), "division is required");
 
-  return createTeam(league!.id, divisionId, player1Id, player2Id);
+    return createTeam(league!.id, divisionId, player1Id, player2Id);
+  }
+
+  if (action === 'editTeam') {
+    const player1Id = formData.get("player1") as string;
+    const player2Id = formData.get("player2") as string;
+    const teamId = formData.get("teamId") as string;
+
+    invariant(Boolean(player1Id), "player 1 is required");
+    invariant(Boolean(player2Id), "player 2 is required");
+
+    return updateTeamUsers(teamId, player1Id, player2Id);
+  }
+
+  return null
+
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -39,10 +57,18 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function AdminTeams() {
   const { users, divisions, teams } = useLoaderData<typeof loader>();
+  const [isEditing, setIsEditing] = useState(false)
+  const [editingTeam, setEditingTeam] = useState<TeamWithUsers>()
   const formRef = useRef<HTMLFormElement>(null);
+  const editingFormRef = useRef<HTMLFormElement>(null);
   const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+
   useEffect(() => {
     formRef.current?.reset();
+    editingFormRef.current?.reset();
+    setEditingTeam(undefined);
+    setIsEditing(false);
   }, [actionData]);
 
   const usersIdsOnTeams = teams.reduce((acc, curr) => {
@@ -56,6 +82,17 @@ export default function AdminTeams() {
     (user) => !usersIdsOnTeams.includes(user.id),
   );
 
+  const availableUsersForEdit = users.filter(
+    (user) => {
+      return !usersIdsOnTeams.includes(user.id) || editingTeam?.users.some(u => u.id === user.id)
+    }
+  );
+
+  const editTeam = (team: TeamWithUsers) => {
+    setIsEditing(true);
+    setEditingTeam(team)
+  }
+
   return (
     <div>
       <Heading>{divisions[0].league.name} Teams</Heading>
@@ -64,20 +101,24 @@ export default function AdminTeams() {
           <div key={division.id}>
             <Heading size="2">{division.name.toUpperCase()}</Heading>
             {division.teams.map((team) => (
-              <div key={team.id}>{getTeamName(team)}</div>
+              <Flex align='center' gap='2' key={team.id}>
+                <div>{getTeamName(team)}</div>
+
+                <IconButton variant="ghost" onClick={() => editTeam(team as unknown as TeamWithUsers)}><Pencil2Icon /></IconButton>
+
+              </Flex>
             ))}
           </div>
         ))}
       </Flex>
-
-      <Form method="post" ref={formRef} key={usersWithoutTeam.length}>
+      {isEditing && editingTeam ? <Form method="post" ref={editingFormRef} key={navigation.state}>
         <Card>
-          <Heading>Add new team</Heading>
+          <Heading>Edit team users</Heading>
           <Flex gap="3" py="3" direction='column'>
-            <Select.Root name="player1">
+            <Select.Root key={editingTeam?.users[0].id} name="player1" defaultValue={editingTeam?.users[0].id || ''}>
               <Select.Trigger placeholder="select player 1" />
               <Select.Content>
-                {usersWithoutTeam.map((user) => (
+                {availableUsersForEdit.map((user) => (
                   <Select.Item
                     key={user.id}
                     value={user.id}
@@ -85,10 +126,10 @@ export default function AdminTeams() {
                 ))}
               </Select.Content>
             </Select.Root>
-            <Select.Root name="player2">
+            <Select.Root key={editingTeam?.users[1].id} name="player2" defaultValue={editingTeam?.users[1].id || ''}>
               <Select.Trigger placeholder="select player 2" />
               <Select.Content>
-                {usersWithoutTeam.map((user) => (
+                {availableUsersForEdit.map((user) => (
                   <Select.Item
                     key={user.id}
                     value={user.id}
@@ -96,24 +137,57 @@ export default function AdminTeams() {
                 ))}
               </Select.Content>
             </Select.Root>
-            <Select.Root name="division">
-              <Select.Trigger placeholder="select division" />
-              <Select.Content>
-                {divisions.map((division) => (
-                  <Select.Item
-                    key={division.id}
-                    value={division.id}
-                  >{`${division.name}`}</Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-            <Button type="submit" variant="solid">
+            <input type="hidden" name="teamId" value={editingTeam.id} />
+            <Button variant="solid" name="_action" value='editTeam' type="submit">
               save
             </Button>
           </Flex>
         </Card>
-      </Form>
-
+      </Form> :
+        <Form method="post" ref={formRef} key={usersWithoutTeam.length}>
+          <Card>
+            <Heading>Add new team</Heading>
+            <Flex gap="3" py="3" direction='column'>
+              <Select.Root name="player1">
+                <Select.Trigger placeholder="select player 1" />
+                <Select.Content>
+                  {usersWithoutTeam.map((user) => (
+                    <Select.Item
+                      key={user.id}
+                      value={user.id}
+                    >{`${user.profile?.firstName} ${user.profile?.lastName}`}</Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+              <Select.Root name="player2">
+                <Select.Trigger placeholder="select player 2" />
+                <Select.Content>
+                  {usersWithoutTeam.map((user) => (
+                    <Select.Item
+                      key={user.id}
+                      value={user.id}
+                    >{`${user.profile?.firstName} ${user.profile?.lastName}`}</Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+              <Select.Root name="division">
+                <Select.Trigger placeholder="select division" />
+                <Select.Content>
+                  {divisions.map((division) => (
+                    <Select.Item
+                      key={division.id}
+                      value={division.id}
+                    >{`${division.name}`}</Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+              <Button type="submit" variant="solid" name="_action" value='create'>
+                save
+              </Button>
+            </Flex>
+          </Card>
+        </Form>
+      }
     </div>
   );
 }
