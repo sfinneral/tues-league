@@ -1,12 +1,16 @@
 import { Button, Flex, Heading } from "@radix-ui/themes";
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
-import { getLeagueSlugByUserId } from "~/models/user.server";
+import { getLeagueSlugByUserId, getUserWithSubs } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await requireUserId(request);
-  const leagueSlug = await getLeagueSlugByUserId(userId);
+  let leagueSlug = await getLeagueSlugByUserId(userId);
+  const userSubs = await getUserWithSubs(userId)
+  if (userSubs?.subs.length && !leagueSlug) {
+    leagueSlug = userSubs.subs[0].league.slug
+  }
   if (leagueSlug) {
     return redirect(`/${leagueSlug}`);
   } else {

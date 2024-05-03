@@ -18,7 +18,7 @@ model User {
   profileId String?
   profile   Profile?
   teams     Team[]
-  Sub       Sub[]
+  subs      Sub[]
 }
 
 model Password {

@@ -20,6 +20,20 @@ export async function getUserById(id: User["id"]) {
   });
 }
 
+export function getUserWithSubs(id: User['id']) {
+  return prisma.user.findUnique({
+    where: { id },
+    include: {
+      profile: true,
+      subs: {
+        include: {
+          league: true
+        }
+      }
+    }
+  })
+}
+
 export async function getUserByEmail(email: User["email"]) {
   return prisma.user.findUnique({ where: { email } });
 }
