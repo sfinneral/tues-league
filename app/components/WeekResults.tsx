@@ -15,7 +15,9 @@ interface ScoresSimple {
 
 const getScores = (matches: MatchWithScoresAndTeams[]) => {
   const scores: ScoresSimple[] = [];
-  const weeklyPayout = 200;
+  const weeklyPayout = 250;
+  const firstPlacePercent = 0.8;
+  const secondPlacePercent = 0.2;
   matches.forEach((match) => {
     match.scores.forEach((score) => {
       scores.push({
@@ -37,18 +39,18 @@ const getScores = (matches: MatchWithScoresAndTeams[]) => {
         scores[i].color = 'green';
       }
     } else {
-      scores[0].place = `1st ${formatCurrency(weeklyPayout * 0.75)}`;
+      scores[0].place = `1st ${formatCurrency(weeklyPayout * firstPlacePercent)}`;
       scores[0].color = 'green';
       // if tie for 2nd
       if (scores[1].score === scores[2].score) {
         // find all scores === scores[1]
         const amountOf2ndTies = scores.filter(score => score.score === scores[1].score).length
         for (let i = 1; i < amountOf2ndTies + 1; i++) {
-          scores[i].place = `T2nd ${formatCurrency((weeklyPayout * 0.25) / amountOf2ndTies)}`;
+          scores[i].place = `T2nd ${formatCurrency((weeklyPayout * secondPlacePercent) / amountOf2ndTies)}`;
           scores[i].color = 'blue';
         }
       } else {
-        scores[1].place = `2nd ${formatCurrency(weeklyPayout * 0.25)}`
+        scores[1].place = `2nd ${formatCurrency(weeklyPayout * secondPlacePercent)}`
         scores[1].color = 'blue';
       }
     }
