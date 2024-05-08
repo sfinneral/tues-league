@@ -102,6 +102,8 @@ export default function AdminTeams() {
     (user) => !usersIdsOnTeams.includes(user.id),
   );
 
+  const availableForSubs = usersWithoutTeam.filter((user) => !subs.some(sub => sub.userId === user.id))
+
   const availableUsersForEdit = users.filter(
     (user) => {
       return !usersIdsOnTeams.includes(user.id) || editingTeam?.users.some(u => u.id === user.id)
@@ -223,14 +225,14 @@ export default function AdminTeams() {
         </Form>
       }
       <div className="my-8">
-        <Form method="post" ref={subFormRef} key={usersWithoutTeam.length}>
+        <Form method="post" ref={subFormRef} key={availableForSubs.length}>
           <Card>
             <Heading>Add new sub</Heading>
             <Flex gap="3" py="3" direction='column'>
               <Select.Root name="subPlayer">
                 <Select.Trigger placeholder="select player 1" />
                 <Select.Content>
-                  {usersWithoutTeam.map((user) => (
+                  {availableForSubs.map((user) => (
                     <Select.Item
                       key={user.id}
                       value={user.id}

@@ -45,8 +45,6 @@ export default function Carousel({ children, startIndex = 0 }: CarouselProps) {
       }
     };
     init();
-    window.addEventListener("resize", init);
-    return () => window.removeEventListener("resize", init);
   }, []);
 
   useEffect(() => {
@@ -57,9 +55,8 @@ export default function Carousel({ children, startIndex = 0 }: CarouselProps) {
 
   return (
     <div
-      className={`transition-opacity ${
-        hasWidthBeenSet ? "opacity-100" : "opacity-0"
-      }`}
+      className={`transition-opacity ${hasWidthBeenSet ? "opacity-100" : "opacity-0"
+        }`}
     >
       <Flex justify="between" align="center" mb="3">
         {currentIndex > 0 ? (
@@ -74,7 +71,7 @@ export default function Carousel({ children, startIndex = 0 }: CarouselProps) {
         )}
 
         {allItemsRef.current &&
-        currentIndex < allItemsRef.current.children.length - 1 ? (
+          currentIndex < allItemsRef.current.children.length - 1 ? (
           <Button
             variant="ghost"
             onClick={() => setCurrentIndex(currentIndex + 1)}
