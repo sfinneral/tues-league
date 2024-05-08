@@ -1,5 +1,5 @@
 import { ChatBubbleIcon, EnvelopeClosedIcon } from "@radix-ui/react-icons";
-import { Card, Flex, Heading, IconButton, Text } from "@radix-ui/themes";
+import { Button, Card, Flex, Heading, IconButton, Text } from "@radix-ui/themes";
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getDivisionTeamsUsersProfileByLeagueSlug } from "~/models/division.server";
@@ -23,24 +23,20 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 export default function LeagueMembers() {
   const { divisions, usersTeam, subs } = useLoaderData<typeof loader>();
+  const smsRoot = "sms://open?addresses="
+  const emailRoot = "mailto:";
 
   const smsLink = (team: TeamWithUsers) => {
-    let smsString = "sms://open?addresses=";
     const allUsers = [...team.users, ...(usersTeam?.users || [])];
-    allUsers.forEach((team, index) => {
-      smsString += `${cleanedPhoneNumber(team.profile?.phoneNumber)}${index < (allUsers.length - 1) ? "," : ""}`;
-    });
-    return smsString;
+    return smsRoot + allUsers.map(user => cleanedPhoneNumber(user.profile?.phoneNumber)).join(',');
   };
 
   const emailLink = (team: TeamWithUsers) => {
-    let emailString = "mailto:";
     const allUsers = [...team.users, ...(usersTeam?.users || [])];
-    allUsers.forEach((user, index) => {
-      emailString += `${user.email}${index < (allUsers.length - 1) ? "," : ""}`;
-    });
-    return emailString;
+    return emailRoot + allUsers.map(user => user.email).join(',');
   };
+
+  const smsAllSubs = smsRoot + subs?.map(sub => cleanedPhoneNumber(sub.user.profile?.phoneNumber)).join(',')
 
   return (
     <div>
@@ -98,8 +94,8 @@ export default function LeagueMembers() {
                       {sub.user.profile?.firstName} {sub.user.profile?.lastName}
                     </Text>
                     <Flex gap='2'>
-                      <a href={`sms://open?addresses=${cleanedPhoneNumber(sub.user.profile?.phoneNumber)}`}><IconButton variant="soft" title={`Text ${sub.user.profile?.firstName} ${sub.user.profile?.lastName}`}><ChatBubbleIcon /></IconButton></a>
-                      <a href={`mailto:${sub.user.email}`}><IconButton variant="soft" title={`Email ${sub.user.profile?.firstName} ${sub.user.profile?.lastName}`}><EnvelopeClosedIcon /></IconButton></a>
+                      <a href={smsRoot + cleanedPhoneNumber(sub.user.profile?.phoneNumber)}><IconButton variant="soft" title={`Text ${sub.user.profile?.firstName} ${sub.user.profile?.lastName}`}><ChatBubbleIcon /></IconButton></a>
+                      <a href={emailRoot + sub.user.email}><IconButton variant="soft" title={`Email ${sub.user.profile?.firstName} ${sub.user.profile?.lastName}`}><EnvelopeClosedIcon /></IconButton></a>
                     </Flex>
                   </Flex>
                   <Flex direction='column' gap='2'>
@@ -113,6 +109,7 @@ export default function LeagueMembers() {
                 </Flex>
               </Card>
             ))}
+            <a href={smsAllSubs} className="flex justify-center"><Button variant="soft"><ChatBubbleIcon />Text all subs</Button></a>
           </div>
         </div>
         : null}
