@@ -30,7 +30,7 @@ export default function LeagueHome() {
   }
 
   const outcomeBadge = (scores: Score[], teamId: Team['id']) => {
-    const sortedScores = scores.sort((a, b) => (a.score || Infinity) - (b.score || Infinity))
+    const sortedScores = [...scores].sort((a, b) => (a.score || Infinity) - (b.score || Infinity))
     if (!sortedScores[0].score) return null
     if (sortedScores[0].score === sortedScores[1].score) {
       return <Badge ml='2' color="blue">Tie</Badge>
