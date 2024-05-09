@@ -1,5 +1,5 @@
 import { ChatBubbleIcon, EnvelopeClosedIcon } from "@radix-ui/react-icons";
-import { Button, Card, Flex, Heading, IconButton, Text } from "@radix-ui/themes";
+import { Button, Card, Flex, Heading, IconButton, Separator, Text } from "@radix-ui/themes";
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getDivisionTeamsUsersProfileByLeagueSlug } from "~/models/division.server";
@@ -41,16 +41,17 @@ export default function LeagueMembers() {
   return (
     <div>
       {divisions.map((division) => (
-        <div className="mb-10" key={division.id}>
-          <Heading align="center" size="3">
+        <Card className="mb-10" key={division.id}>
+          <Heading align="center" size="5">
             {division.name}
           </Heading>
-          {division.teams.map((team) => (
-            <Card my="4" key={team.id}>
+          <Separator size='4' mb='5' mt='2' />
+          {division.teams.map((team, teamIndex) => (
+            <div key={team.id}>
               <Flex direction="column" gap="4">
                 <Flex justify="between" gap="4">
-                  {team.users.map((user) => (
-                    <Flex direction="column" gap='2' key={user.id}>
+                  {team.users.map((user, index) => (
+                    <Flex direction="column" gap='2' key={user.id} align={index === 1 ? 'end' : 'start'}>
                       <Text weight="bold">
                         {user.profile?.firstName} {user.profile?.lastName}
                       </Text>
@@ -76,18 +77,21 @@ export default function LeagueMembers() {
                   </a>
                 </Flex>
               </Flex>
-            </Card>
+              {(teamIndex < division.teams.length - 1) ? <Separator size='4' my='5' /> : null}
+            </div>
           ))}
-        </div>
+        </Card>
       ))}
       {subs && subs.length ?
-        <div>
-          <Heading align="center" size="3">
+        <Card>
+          <Heading align="center" size='5'>
             Subs
           </Heading>
+          <Separator size='4' mb='5' mt='2' />
           <div>
-            {subs?.map(sub => (
-              <Card my='4' key={sub.id}>
+            {subs?.map((sub, subIndex) => (
+              <div key={sub.id}>
+
                 <Flex justify='between' align='center' gap='2' key={sub.id}>
                   <Flex direction='column' gap='4'>
                     <Text weight="bold">
@@ -98,7 +102,7 @@ export default function LeagueMembers() {
                       <a href={emailRoot + sub.user.email}><IconButton variant="soft" title={`Email ${sub.user.profile?.firstName} ${sub.user.profile?.lastName}`}><EnvelopeClosedIcon /></IconButton></a>
                     </Flex>
                   </Flex>
-                  <Flex direction='column' gap='2'>
+                  <Flex direction='column' gap='2' align='end'>
                     <Text size="1" color="gray">
                       {sub.user.email}
                     </Text>
@@ -107,11 +111,13 @@ export default function LeagueMembers() {
                     </Text>
                   </Flex>
                 </Flex>
-              </Card>
+                {(subIndex < subs.length - 1) ? <Separator size='4' my='5' /> : null}
+              </div>
+
             ))}
-            <a href={smsAllSubs} className="flex justify-center"><Button variant="soft"><ChatBubbleIcon />Text all subs</Button></a>
+            <a href={smsAllSubs} className="flex justify-center mt-10"><Button variant="soft"><ChatBubbleIcon />Text all subs</Button></a>
           </div>
-        </div>
+        </Card>
         : null}
     </div>
   );

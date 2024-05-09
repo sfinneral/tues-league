@@ -46,15 +46,13 @@ export default function AdminMatches() {
 
   return (
     <div>
-      <Heading>Matches</Heading>
-
       {schedules?.length ? (
         schedules.map((schedule) => (
-          <div key={schedule.id} className="mb-4">
+          <div key={schedule.id} className="mb-10">
             <Heading size="4" align="center">
               {schedule.division.name}
             </Heading>
-            <div className="-mt-5">
+            <div className="-mt-8">
               <Carousel startIndex={startIndex(schedule.id)}>
                 {schedule.weeks.map((week) => (
                   <Form method="post" key={week.id}>
@@ -70,9 +68,11 @@ export default function AdminMatches() {
                         </Flex>
                       </Card>
                     ))}
-                    <Button type="submit" className="w-full">
-                      Save
-                    </Button>
+                    <Flex justify='center'>
+                      <Button type="submit" className="w-full">
+                        Save {schedule.division.name} Scores
+                      </Button>
+                    </Flex>
                   </Form>
                 ))}
               </Carousel>

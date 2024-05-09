@@ -1,5 +1,5 @@
-import { Schedule } from "@prisma/client";
-import { Card, Flex, Heading } from "@radix-ui/themes";
+import { Schedule, Score, Team } from "@prisma/client";
+import { Badge, Card, Flex, Heading, Separator } from "@radix-ui/themes";
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import Carousel from "~/components/Carousel";
@@ -28,33 +28,49 @@ export default function LeagueHome() {
     })
     return !firstWeekWithoutScores ? 0 : (firstWeekWithoutScores - 1)
   }
+
+  const outcomeBadge = (scores: Score[], teamId: Team['id']) => {
+    const sortedScores = scores.sort((a, b) => (a.score || Infinity) - (b.score || Infinity))
+    if (!sortedScores[0].score) return null
+    if (sortedScores[0].score === sortedScores[1].score) {
+      return <Badge ml='2' color="blue">Tie</Badge>
+    } else if (sortedScores[0].teamId === teamId) {
+      return <Badge ml='2' color="green">Win</Badge>
+    } else {
+      return null
+    }
+  }
   return (
     <div>
       {schedules?.length ? (
         schedules.map((schedule) => (
           <div key={schedule.id} className="mb-16">
-            <Heading size="4" align="center">
+            <Heading size="5" align="center">
               {schedule.division.name}
             </Heading>
-            <div className="-mt-5">
+            <div className="-mt-8">
               <Carousel startIndex={startIndex(schedule.id)}>
                 {schedule.weeks.map((week) => (
                   <div key={week.id}>
                     <Heading align="center" size="2">
                       {formatDate(week.date)}
                     </Heading>
-                    {week.matches.map((match) => (
-                      <Card key={match.id} my="4">
-                        <Flex gap="2" direction="column">
-                          {match.scores.map((score) => (
-                            <Flex key={score.id} justify="between" align="center">
-                              <div>{getTeamNameByMatch(match, score.teamId)}</div>
-                              <div>{score.score}</div>
-                            </Flex>
-                          ))}
-                        </Flex>
-                      </Card>
-                    ))}
+                    <Card my='4'>
+                      {week.matches.map((match, matchIndex) => (
+                        <div key={match.id}>
+                          <Flex direction="column">
+                            {match.scores.map((score) => (
+                              <Flex key={score.id} justify="between" align="center">
+                                <div>{getTeamNameByMatch(match, score.teamId)}{outcomeBadge(match.scores, score.teamId)}</div>
+                                <div>{score.score}</div>
+                              </Flex>
+                            ))}
+                          </Flex>
+                          {(matchIndex < week.matches.length - 1) ? <Separator size='4' my='4' /> : null}
+                        </div>
+
+                      ))}
+                    </Card>
                     <WeekResults matches={week.matches} />
                   </div>
                 ))}

@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, ArrowRightIcon } from "@radix-ui/react-icons";
-import { Button, Flex } from "@radix-ui/themes";
+import { Flex, IconButton } from "@radix-ui/themes";
 import { ReactNode, useEffect, useRef, useState } from "react";
 
 interface CarouselProps {
@@ -60,24 +60,24 @@ export default function Carousel({ children, startIndex = 0 }: CarouselProps) {
     >
       <Flex justify="between" align="center" mb="3">
         {currentIndex > 0 ? (
-          <Button
-            variant="ghost"
+          <IconButton
+            variant="soft"
             onClick={() => setCurrentIndex(currentIndex - 1)}
           >
             <ArrowLeftIcon />
-          </Button>
+          </IconButton>
         ) : (
           <div />
         )}
 
         {allItemsRef.current &&
           currentIndex < allItemsRef.current.children.length - 1 ? (
-          <Button
-            variant="ghost"
+          <IconButton
+            variant="soft"
             onClick={() => setCurrentIndex(currentIndex + 1)}
           >
             <ArrowRightIcon />
-          </Button>
+          </IconButton>
         ) : (
           <div />
         )}

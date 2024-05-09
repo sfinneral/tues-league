@@ -1,4 +1,4 @@
-import { Flex, Heading, Table, Text } from "@radix-ui/themes";
+import { Card, Flex, Heading, Table, Text } from "@radix-ui/themes";
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getStandingsBySlug } from "~/models/standings.server";
@@ -18,8 +18,8 @@ export default function LeagueStandings() {
     <div>
       {leagueStandings ? (
         leagueStandings.map((leagueStanding) => (
-          <div key={leagueStanding.division.id} className="mb-16">
-            <Heading size="4" align="center">
+          <Card key={leagueStanding.division.id} className="mb-8">
+            <Heading size="5" align="center">
               {leagueStanding.division.name}
             </Heading>
             <Table.Root>
@@ -56,7 +56,7 @@ export default function LeagueStandings() {
                 ))}
               </Table.Body>
             </Table.Root>
-          </div>
+          </Card>
         ))
       ) : (
         <Text>No standings yet</Text>
