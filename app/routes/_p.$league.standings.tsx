@@ -1,6 +1,7 @@
-import { Card, Flex, Heading, Table, Text } from "@radix-ui/themes";
+import { Card, Heading, Table, Text } from "@radix-ui/themes";
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import LeagueStandingRow from "~/components/LeagueStandingRow";
 import { getStandingsBySlug } from "~/models/standings.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -19,10 +20,10 @@ export default function LeagueStandings() {
       {leagueStandings ? (
         leagueStandings.map((leagueStanding) => (
           <Card key={leagueStanding.division.id} className="mb-8">
-            <Heading size="5" align="center">
+            <Heading size="5" align="center" mb="4">
               {leagueStanding.division.name}
             </Heading>
-            <Table.Root>
+            <Table.Root size="1">
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeaderCell>Team</Table.ColumnHeaderCell>
@@ -36,26 +37,14 @@ export default function LeagueStandings() {
               </Table.Header>
               <Table.Body>
                 {leagueStanding.standings.map((standing) => (
-                  <Table.Row key={standing.teamId}>
-                    <Table.RowHeaderCell>
-                      {standing.teamName}
-                    </Table.RowHeaderCell>
-                    <Table.Cell>
-                      <Flex justify="between">
-                        <div>{standing.wins}</div>
-                        <div>-</div>
-                        <div>{standing.losses}</div>
-                        <div>-</div>
-                        <div>{standing.ties}</div>
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell className="text-center">
-                      {standing.points}
-                    </Table.Cell>
-                  </Table.Row>
+                  <LeagueStandingRow
+                    standing={standing}
+                    key={standing.teamId}
+                  />
                 ))}
               </Table.Body>
             </Table.Root>
+            <br />
           </Card>
         ))
       ) : (

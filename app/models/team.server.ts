@@ -67,8 +67,8 @@ export function createTeam(
   });
 }
 
-export function deleteTeam(teamId: Team['id']) {
-  return prisma.team.delete({ where: { id: teamId } })
+export function deleteTeam(teamId: Team["id"]) {
+  return prisma.team.delete({ where: { id: teamId } });
 }
 
 export async function updateTeamUsers(
@@ -76,17 +76,12 @@ export async function updateTeamUsers(
   player1Id: User["id"],
   player2Id: User["id"],
 ) {
-  return prisma.team.update(
-    {
-      where: { id: teamId },
-      data: {
-        users: {
-          set: [
-            { id: player1Id },
-            { id: player2Id },
-          ]
-        }
-      }
-    }
-  )
+  return prisma.team.update({
+    where: { id: teamId },
+    data: {
+      users: {
+        set: [{ id: player1Id }, { id: player2Id }],
+      },
+    },
+  });
 }

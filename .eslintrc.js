@@ -50,7 +50,7 @@ module.exports = {
           "warn",
           { validStrategies: ["ternary"] },
         ],
-        "react-hooks/exhaustive-deps": "off"
+        "react-hooks/exhaustive-deps": "off",
       },
     },
 

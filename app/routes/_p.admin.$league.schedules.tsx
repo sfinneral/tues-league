@@ -55,8 +55,8 @@ export default function AdminSchedules() {
 
   return (
     <div>
-      <Heading mb='4'>Schedules</Heading>
-      <Card mb='8'>
+      <Heading mb="4">Schedules</Heading>
+      <Card mb="8">
         {divisions.map((division) => (
           <Form key={division.id} method="post">
             <Flex gap="3" className="my-3 align-middle">
@@ -66,7 +66,10 @@ export default function AdminSchedules() {
               <input type="hidden" name="divisionId" value={division.id} />
               {!division.schedule ? (
                 <>
-                  <TextField.Root placeholder="# of weeks" name="numberOfWeeks" />
+                  <TextField.Root
+                    placeholder="# of weeks"
+                    name="numberOfWeeks"
+                  />
 
                   <TextField.Root
                     placeholder="start date"
@@ -84,7 +87,6 @@ export default function AdminSchedules() {
               )}
             </Flex>
           </Form>
-
         ))}
       </Card>
 
@@ -111,7 +113,6 @@ export default function AdminSchedules() {
           </div>
         </div>
       ))}
-
     </div>
   );
 }

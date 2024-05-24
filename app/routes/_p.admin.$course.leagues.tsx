@@ -47,9 +47,9 @@ export default function AdminLeagues() {
       <Form method="post" ref={formRef}>
         <section>
           {leagues.map((league) => (
-            <Flex gap="3" direction='column' key={league.id} mb='4'>
+            <Flex gap="3" direction="column" key={league.id} mb="4">
               <Text>{league.name}</Text>
-              <Flex gap='2'>
+              <Flex gap="2">
                 <Link to={`/admin/${league.slug}/divisions`}>
                   <Button variant="surface">divisions</Button>
                 </Link>
@@ -64,9 +64,9 @@ export default function AdminLeagues() {
           ))}
         </section>
 
-        <Card mt='10'>
-          <Heading size='2'>Add new league</Heading>
-          <Flex gap="3" py="3" direction='column'>
+        <Card mt="10">
+          <Heading size="2">Add new league</Heading>
+          <Flex gap="3" py="3" direction="column">
             <TextField.Root name="name" placeholder="league name" />
             <TextField.Root name="slug" placeholder="league slug" />
             <TextField.Root
@@ -79,7 +79,6 @@ export default function AdminLeagues() {
             </Button>
           </Flex>
         </Card>
-
       </Form>
     </div>
   );

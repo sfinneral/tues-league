@@ -115,6 +115,13 @@ export function formatDate(dateString: string) {
   }).format(new Date(dateString));
 }
 
+export function formatDateMini(dateString: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "numeric",
+    day: "numeric",
+  }).format(new Date(dateString));
+}
+
 export const getTeamNameByMatch = (
   match: MatchWithScoresAndTeams,
   teamId: Team["id"],
@@ -124,24 +131,28 @@ export const getTeamNameByMatch = (
 };
 
 export const formatPhoneNumber = (phoneNumberString?: string | null) => {
-  if (!phoneNumberString) return ''
+  if (!phoneNumberString) return "";
   const cleaned = cleanedPhoneNumber(phoneNumberString);
   const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
   if (match) {
-    return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+    return "(" + match[1] + ") " + match[2] + "-" + match[3];
   }
   return phoneNumberString;
-}
+};
 
 export const cleanedPhoneNumber = (phoneNumberString?: string | null) => {
-  if (!phoneNumberString) return ''
-  if (phoneNumberString.split('')[0] === '1') {
+  if (!phoneNumberString) return "";
+  if (phoneNumberString.split("")[0] === "1") {
     phoneNumberString = phoneNumberString.substring(1);
   }
-  return ('' + phoneNumberString).replace(/\D/g, '');
-}
+  return ("" + phoneNumberString).replace(/\D/g, "");
+};
 
 export const formatCurrency = (number = 0) => {
-  const usDollar = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+  const usDollar = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
   return usDollar.format(number);
-}
+};

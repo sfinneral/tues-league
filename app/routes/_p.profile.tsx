@@ -1,10 +1,21 @@
-import { Button, Flex, Heading, Separator, Text, TextField } from "@radix-ui/themes";
+import {
+  Button,
+  Flex,
+  Heading,
+  Separator,
+  Text,
+  TextField,
+} from "@radix-ui/themes";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, json, redirect, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
-import { getLeagueSlugByUserId, getUserById, updateUser } from "~/models/user.server";
+import {
+  getLeagueSlugByUserId,
+  getUserById,
+  updateUser,
+} from "~/models/user.server";
 import { getUserId } from "~/session.server";
 import { formatPhoneNumber } from "~/utils";
 
@@ -28,8 +39,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await getUserId(request);
   if (userId) {
     const user = await getUserById(userId);
-    const isAdmin = user && process.env.ADMIN_EMAILS?.includes(user.email)
-    const leagueSlug = await getLeagueSlugByUserId(userId)
+    const isAdmin = user && process.env.ADMIN_EMAILS?.includes(user.email);
+    const leagueSlug = await getLeagueSlugByUserId(userId);
     return json({ user, isAdmin, leagueSlug });
   }
 }
@@ -115,14 +126,19 @@ export default function Profile() {
           </Flex>
         </Flex>
       )}
-      {isAdmin ? <div>
-        <Separator my="6" size="4" />
-        <Flex direction='column'>
-          <Heading size='2' mb='4'>Admin Links</Heading>
-          <Link to={`/admin/${leagueSlug}/matches`}><Button>Enter Scores</Button></Link>
-        </Flex>
-      </div> : null
-      }
+      {isAdmin ? (
+        <div>
+          <Separator my="6" size="4" />
+          <Flex direction="column" gap="2">
+            <Heading size="2" mb="4">
+              Admin Links
+            </Heading>
+            <Link to={`/admin/${leagueSlug}/matches`}>
+              <Button>Enter Scores</Button>
+            </Link>
+          </Flex>
+        </div>
+      ) : null}
     </div>
   );
 }

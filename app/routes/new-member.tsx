@@ -7,14 +7,14 @@ import { requireUserId } from "~/session.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await requireUserId(request);
   let leagueSlug = await getLeagueSlugByUserId(userId);
-  const userSubs = await getUserWithSubs(userId)
+  const userSubs = await getUserWithSubs(userId);
   if (userSubs?.subs.length && !leagueSlug) {
-    leagueSlug = userSubs.subs[0].league.slug
+    leagueSlug = userSubs.subs[0].league.slug;
   }
   if (leagueSlug) {
     return redirect(`/${leagueSlug}`);
   } else {
-    return null
+    return null;
   }
 }
 

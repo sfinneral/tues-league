@@ -19,27 +19,39 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function LeagueHome() {
   const { schedules } = useLoaderData<typeof loader>();
 
-  const startIndex = (scheduleId: Schedule['id']) => {
-    const schedule = schedules.find(schedule => schedule.id === scheduleId)
-    const firstWeekWithoutScores = schedule && schedule.weeks.findIndex(week => {
-      return week.matches.find(match => {
-        return match.scores.find(score => !score.score)
-      })
-    })
-    return !firstWeekWithoutScores ? 0 : (firstWeekWithoutScores - 1)
-  }
+  const startIndex = (scheduleId: Schedule["id"]) => {
+    const schedule = schedules.find((schedule) => schedule.id === scheduleId);
+    const firstWeekWithoutScores =
+      schedule &&
+      schedule.weeks.findIndex((week) => {
+        return week.matches.find((match) => {
+          return match.scores.find((score) => !score.score);
+        });
+      });
+    return !firstWeekWithoutScores ? 0 : firstWeekWithoutScores - 1;
+  };
 
-  const outcomeBadge = (scores: Score[], teamId: Team['id']) => {
-    const sortedScores = [...scores].sort((a, b) => (a.score || Infinity) - (b.score || Infinity))
-    if (!sortedScores[0].score) return null
+  const outcomeBadge = (scores: Score[], teamId: Team["id"]) => {
+    const sortedScores = [...scores].sort(
+      (a, b) => (a.score || Infinity) - (b.score || Infinity),
+    );
+    if (!sortedScores[0].score) return null;
     if (sortedScores[0].score === sortedScores[1].score) {
-      return <Badge ml='2' color="blue">Tie</Badge>
+      return (
+        <Badge ml="2" color="blue">
+          Tie
+        </Badge>
+      );
     } else if (sortedScores[0].teamId === teamId) {
-      return <Badge ml='2' color="green">Win</Badge>
+      return (
+        <Badge ml="2" color="green">
+          Win
+        </Badge>
+      );
     } else {
-      return null
+      return null;
     }
-  }
+  };
   return (
     <div>
       {schedules?.length ? (
@@ -55,20 +67,28 @@ export default function LeagueHome() {
                     <Heading align="center" size="2">
                       {formatDate(week.date)}
                     </Heading>
-                    <Card my='4'>
+                    <Card my="4">
                       {week.matches.map((match, matchIndex) => (
                         <div key={match.id}>
                           <Flex direction="column">
                             {match.scores.map((score) => (
-                              <Flex key={score.id} justify="between" align="center">
-                                <div>{getTeamNameByMatch(match, score.teamId)}{outcomeBadge(match.scores, score.teamId)}</div>
+                              <Flex
+                                key={score.id}
+                                justify="between"
+                                align="center"
+                              >
+                                <div>
+                                  {getTeamNameByMatch(match, score.teamId)}
+                                  {outcomeBadge(match.scores, score.teamId)}
+                                </div>
                                 <div>{score.score}</div>
                               </Flex>
                             ))}
                           </Flex>
-                          {(matchIndex < week.matches.length - 1) ? <Separator size='4' my='4' /> : null}
+                          {matchIndex < week.matches.length - 1 ? (
+                            <Separator size="4" my="4" />
+                          ) : null}
                         </div>
-
                       ))}
                     </Card>
                     <WeekResults matches={week.matches} />

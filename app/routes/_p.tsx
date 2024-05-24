@@ -41,7 +41,9 @@ export default function ProtectedWrapper() {
   return (
     <Flex justify="center">
       <div className="h-full max-w-5xl">
-        {user?.profile?.firstName ? <TopBanner firstName={user.profile?.firstName} /> : null}
+        {user?.profile?.firstName ? (
+          <TopBanner firstName={user.profile?.firstName} />
+        ) : null}
 
         <TabNav.Root m="3">
           {navItems.map((navItem) => (

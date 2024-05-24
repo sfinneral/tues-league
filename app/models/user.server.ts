@@ -20,18 +20,18 @@ export async function getUserById(id: User["id"]) {
   });
 }
 
-export function getUserWithSubs(id: User['id']) {
+export function getUserWithSubs(id: User["id"]) {
   return prisma.user.findUnique({
     where: { id },
     include: {
       profile: true,
       subs: {
         include: {
-          league: true
-        }
-      }
-    }
-  })
+          league: true,
+        },
+      },
+    },
+  });
 }
 
 export async function getUserByEmail(email: User["email"]) {
@@ -39,7 +39,9 @@ export async function getUserByEmail(email: User["email"]) {
 }
 
 export async function getAllUsers() {
-  return prisma.user.findMany({ select: { profile: true, email: true, id: true } });
+  return prisma.user.findMany({
+    select: { profile: true, email: true, id: true },
+  });
 }
 
 export async function createUser(

@@ -2,16 +2,28 @@ import { Division, League, Score, Team } from "@prisma/client";
 import { getTeamNameByMatch } from "~/utils";
 import { getSchedulesByLeagueSlug } from "./schedule.server";
 
-interface Standing {
+type Outcome = "w" | "l" | "t";
+interface MatchRecord {
+  outcome: Outcome;
+  opponent: {
+    name: string;
+    score: number | null;
+  };
+  date: string;
+  teamScore: number | null;
+}
+
+export interface Standing {
   teamId: Team["id"];
   teamName: string;
   wins: number;
   losses: number;
   ties: number;
   points: number;
+  matchRecord: MatchRecord[];
 }
 
-interface LeagueStandings {
+export interface LeagueStandings {
   division: Division;
   standings: Standing[];
 }
@@ -34,12 +46,18 @@ export const getStandingsBySlug = async (leagueSlug: League["slug"]) => {
       losses: 0,
       ties: 0,
       points: 0,
+      matchRecord: [],
     });
   };
   const recordOutcome = (
     scheduleIndex: number,
     score: Score,
     outcome: "ties" | "wins" | "losses",
+    opponent: {
+      name: string;
+      score: number | null;
+    },
+    date: string,
   ) => {
     const t = leagueStandings[scheduleIndex].standings.find(
       (team) => team.teamId === score.teamId,
@@ -50,6 +68,12 @@ export const getStandingsBySlug = async (leagueSlug: League["slug"]) => {
     } else if (outcome === "ties") {
       t && t.points++;
     }
+    t?.matchRecord.push({
+      outcome: outcome.charAt(0) as Outcome,
+      opponent,
+      date,
+      teamScore: score.score,
+    });
   };
 
   schedules.forEach((schedule, scheduleIndex) => {
@@ -61,28 +85,42 @@ export const getStandingsBySlug = async (leagueSlug: League["slug"]) => {
       week.matches.forEach((match) => {
         const team1Score = match.scores[0];
         const team2Score = match.scores[1];
+        const team1Name = getTeamNameByMatch(match, team1Score.teamId);
+        const team2Name = getTeamNameByMatch(match, team2Score.teamId);
+        const team1 = {
+          name: team1Name,
+          score: team1Score.score,
+        };
+        const team2 = {
+          name: team2Name,
+          score: team2Score.score,
+        };
         if (team1Score.score && team2Score.score) {
           if (isNewTeam(scheduleIndex, team1Score))
-            newTeam(
+            newTeam(scheduleIndex, team1Score, team1Name);
+          if (isNewTeam(scheduleIndex, team2Score))
+            newTeam(scheduleIndex, team2Score, team2Name);
+          if (team1Score.score === team2Score.score) {
+            recordOutcome(scheduleIndex, team1Score, "ties", team2, week.date);
+            recordOutcome(scheduleIndex, team2Score, "ties", team1, week.date);
+          } else if (team1Score.score >= team2Score.score) {
+            recordOutcome(scheduleIndex, team2Score, "wins", team1, week.date);
+            recordOutcome(
               scheduleIndex,
               team1Score,
-              getTeamNameByMatch(match, team1Score.teamId),
+              "losses",
+              team2,
+              week.date,
             );
-          if (isNewTeam(scheduleIndex, team2Score))
-            newTeam(
+          } else {
+            recordOutcome(scheduleIndex, team1Score, "wins", team2, week.date);
+            recordOutcome(
               scheduleIndex,
               team2Score,
-              getTeamNameByMatch(match, team2Score.teamId),
+              "losses",
+              team1,
+              week.date,
             );
-          if (team1Score.score === team2Score.score) {
-            recordOutcome(scheduleIndex, team1Score, "ties");
-            recordOutcome(scheduleIndex, team2Score, "ties");
-          } else if (team1Score.score >= team2Score.score) {
-            recordOutcome(scheduleIndex, team2Score, "wins");
-            recordOutcome(scheduleIndex, team1Score, "losses");
-          } else {
-            recordOutcome(scheduleIndex, team1Score, "wins");
-            recordOutcome(scheduleIndex, team2Score, "losses");
           }
         }
       });

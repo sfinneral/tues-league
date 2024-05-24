@@ -35,14 +35,17 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function AdminMatches() {
   const { schedules } = useLoaderData<typeof loader>();
 
-  const startIndex = (scheduleId: Schedule['id']) => {
-    const schedule = schedules.find(schedule => schedule.id === scheduleId)
-    return schedule && schedule.weeks.findIndex(week => {
-      return week.matches.find(match => {
-        return match.scores.find(score => !score.score)
+  const startIndex = (scheduleId: Schedule["id"]) => {
+    const schedule = schedules.find((schedule) => schedule.id === scheduleId);
+    return (
+      schedule &&
+      schedule.weeks.findIndex((week) => {
+        return week.matches.find((match) => {
+          return match.scores.find((score) => !score.score);
+        });
       })
-    })
-  }
+    );
+  };
 
   return (
     <div>
@@ -63,12 +66,16 @@ export default function AdminMatches() {
                       <Card key={match.id} my="4">
                         <Flex gap="2" direction="column">
                           {match.scores.map((score) => (
-                            <UpdateScore key={score.id} match={match} score={score} />
+                            <UpdateScore
+                              key={score.id}
+                              match={match}
+                              score={score}
+                            />
                           ))}
                         </Flex>
                       </Card>
                     ))}
-                    <Flex justify='center'>
+                    <Flex justify="center">
                       <Button type="submit" className="w-full">
                         Save {schedule.division.name} Scores
                       </Button>
