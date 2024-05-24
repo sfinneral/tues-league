@@ -28,7 +28,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const phoneNumber = formData.get("phoneNumber") as string;
   invariant(
     id && firstName && lastName && email && phoneNumber,
-    "All fields are required",
+    "All of the fields are required",
   );
 
   await updateUser(id, email, firstName, lastName, phoneNumber);
