@@ -11,6 +11,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import stylesheet from "~/tailwind.css";
+import backgroundImage from "./images/mp-background.jpg";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
@@ -27,7 +28,13 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full dark">
-        <Theme appearance="dark" accentColor="teal" grayColor="slate">
+        <Theme
+          appearance="dark"
+          accentColor="teal"
+          grayColor="slate"
+          style={{ backgroundImage: `url(${backgroundImage})` }}
+          className="bg-fixed bg-center bg-no-repeat bg-cover"
+        >
           <Outlet />
           <ScrollRestoration />
           <Scripts />
