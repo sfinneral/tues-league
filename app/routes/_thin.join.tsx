@@ -153,7 +153,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   return createUserSession({
     redirectTo,
-    remember: false,
+    remember: true,
     request,
     userId: user.id,
   });

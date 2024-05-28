@@ -109,9 +109,20 @@ export default function LoginPage() {
         ) : null}
 
         <input type="hidden" name="redirectTo" value={redirectTo} />
-        <Button type="submit" className="w-full" my="4">
-          Login
-        </Button>
+        <Flex justify="between" align="center">
+          <Button type="submit" className="w-full" my="4">
+            Login
+          </Button>
+          <Link
+            to={{
+              pathname: "/forgot-password",
+              search: searchParams.toString(),
+            }}
+          >
+            <StyledLink size="2">Forgot password?</StyledLink>
+          </Link>
+        </Flex>
+
         <Flex justify="between">
           <Text as="label" size="2">
             <Flex gap="2">
@@ -119,18 +130,21 @@ export default function LoginPage() {
               me
             </Flex>
           </Text>
-
-          <Text size="2" color="gray">
-            Don&apos;t have an account?{" "}
+          <div>
+            <Text size="2" color="gray">
+              Don&apos;t have an account?
+            </Text>
             <Link
               to={{
                 pathname: "/join",
                 search: searchParams.toString(),
               }}
             >
-              <StyledLink>Sign up</StyledLink>
+              <StyledLink ml="2" size="2">
+                Sign up
+              </StyledLink>
             </Link>
-          </Text>
+          </div>
         </Flex>
       </Form>
     </>

@@ -173,3 +173,17 @@ export async function getUsersTeams(
     ? user.teams.find((team) => team.leagueId === league.id)
     : null;
 }
+
+export async function updateUsersPassword(email: string, password: string) {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  return prisma.user.update({
+    where: { email },
+    data: {
+      password: {
+        update: {
+          hash: hashedPassword,
+        },
+      },
+    },
+  });
+}
