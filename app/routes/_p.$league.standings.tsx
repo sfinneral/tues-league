@@ -31,7 +31,7 @@ export default function LeagueStandings() {
                     Record
                   </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell className="text-center">
-                    Points
+                    Total
                   </Table.ColumnHeaderCell>
                 </Table.Row>
               </Table.Header>

@@ -21,6 +21,8 @@ export interface Standing {
   ties: number;
   points: number;
   matchRecord: MatchRecord[];
+  totalScore: number;
+  totalOpponentScore: number;
 }
 
 export interface LeagueStandings {
@@ -47,6 +49,8 @@ export const getStandingsBySlug = async (leagueSlug: League["slug"]) => {
       ties: 0,
       points: 0,
       matchRecord: [],
+      totalScore: 0,
+      totalOpponentScore: 0,
     });
   };
   const recordOutcome = (
@@ -74,6 +78,12 @@ export const getStandingsBySlug = async (leagueSlug: League["slug"]) => {
       date,
       teamScore: score.score,
     });
+    if (t && score.score) {
+      t.totalScore = t.totalScore + score.score;
+    }
+    if (t && opponent.score) {
+      t.totalOpponentScore = t.totalOpponentScore + opponent.score;
+    }
   };
 
   schedules.forEach((schedule, scheduleIndex) => {

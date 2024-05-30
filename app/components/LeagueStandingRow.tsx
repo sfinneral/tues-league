@@ -15,6 +15,12 @@ export default function LeagueStandingRow({
   const badgeColor = (outcome: string) => {
     return outcome === "w" ? "green" : outcome === "l" ? "red" : "blue";
   };
+  const totalScore = (totalScore: number) => {
+    const score = totalScore - standing.matchRecord.length * 36;
+    if (score === 0) return "EVEN";
+    else if (score >= 0) return `+${score}`;
+    else return score;
+  };
   return (
     <>
       <Table.Row
@@ -41,7 +47,9 @@ export default function LeagueStandingRow({
             <div>{standing.ties}</div>
           </Flex>
         </Table.Cell>
-        <Table.Cell className="text-center">{standing.points}</Table.Cell>
+        <Table.Cell className="text-center">
+          {totalScore(standing.totalScore)}
+        </Table.Cell>
       </Table.Row>
       {showRecord ? (
         <Table.Row>
@@ -68,6 +76,12 @@ export default function LeagueStandingRow({
                 </Flex>
               </Flex>
             ))}
+            <Flex justify="between">
+              <Text ml="8">Total</Text>
+              <Text mr="7">{`${totalScore(standing.totalScore)} vs ${totalScore(
+                standing.totalOpponentScore,
+              )}`}</Text>
+            </Flex>
           </Table.Cell>
         </Table.Row>
       ) : null}
