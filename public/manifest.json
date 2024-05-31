@@ -1,7 +1,6 @@
 {
   "name": "Tuesday Twi",
   "short_name": "Twi",
-  "theme_color": "#14a494",
   "background_color": "#181818",
   "display": "standalone",
   "orientation": "portrait",

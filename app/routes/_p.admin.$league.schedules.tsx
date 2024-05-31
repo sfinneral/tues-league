@@ -80,11 +80,11 @@ export default function AdminSchedules() {
                     generate
                   </Button>
                 </>
-              ) : (
-                <Button color="red" name="_action" value="delete" type="submit">
-                  delete schedule
-                </Button>
-              )}
+              ) : null
+              // <Button color="red" name="_action" value="delete" type="submit">
+              //   delete schedule
+              // </Button>
+              }
             </Flex>
           </Form>
         ))}

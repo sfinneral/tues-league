@@ -16,7 +16,7 @@ import backgroundImage from "./images/mp-background.jpg";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
-  { rel: "manifest", href: "manifest.json" },
+  { rel: "manifest", href: "/manifest.json" },
 ];
 
 export default function App() {
