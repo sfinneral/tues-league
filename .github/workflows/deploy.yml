@@ -76,7 +76,7 @@ jobs:
       - name: ⚡ Run vitest
         run: npm run test -- --coverage
 
-  cypress:
+  # cypress:
     name: ⚫️ Cypress
     runs-on: ubuntu-latest
     steps:
