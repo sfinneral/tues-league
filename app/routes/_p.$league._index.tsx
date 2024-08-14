@@ -28,7 +28,13 @@ export default function LeagueHome() {
           return match.scores.find((score) => !score.score);
         });
       });
-    return !firstWeekWithoutScores ? 0 : firstWeekWithoutScores - 1;
+    if (!schedule || firstWeekWithoutScores === undefined || firstWeekWithoutScores === 0) {
+      return 0
+    }
+    if (firstWeekWithoutScores < 0) {
+      return schedule.weeks.length - 1
+    }
+    return firstWeekWithoutScores - 1
   };
 
   const outcomeBadge = (scores: Score[], teamId: Team["id"]) => {
