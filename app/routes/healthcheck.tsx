@@ -1,25 +1,14 @@
 // learn more: https://fly.io/docs/reference/configuration/#services-http_checks
-import type { LoaderFunctionArgs } from "@remix-run/node";
-
+import { json } from "@remix-run/node";
 import { prisma } from "~/db.server";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const host =
-    request.headers.get("X-Forwarded-Host") ?? request.headers.get("host");
-
+export async function loader() {
   try {
-    const url = new URL("/", `http://${host}`);
-    // if we can connect to the database and make a simple query
-    // and make a HEAD request to ourselves, then we're good.
-    await Promise.all([
-      prisma.user.count(),
-      fetch(url.toString(), { method: "HEAD" }).then((r) => {
-        if (!r.ok) return Promise.reject(r);
-      }),
-    ]);
-    return new Response("OK");
-  } catch (error: unknown) {
-    console.log("healthcheck ❌", { error });
-    return new Response("ERROR", { status: 500 });
+    // Try to connect to the database
+    await prisma.$queryRaw`SELECT 1`;
+    return json({ status: "ok" }, { status: 200 });
+  } catch (error) {
+    console.error("Health check failed:", error);
+    return json({ status: "error", error: "Database connection failed" }, { status: 500 });
   }
-};
+}
