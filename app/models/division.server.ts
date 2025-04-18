@@ -24,6 +24,15 @@ export function getDivisionseByLeagueSlug(slug: League["slug"]) {
     where: { league: { slug } },
     include: {
       schedule: true,
+      teams: {
+        include: {
+          users: {
+            include: {
+              profile: true,
+            },
+          },
+        },
+      },
     },
   });
 }

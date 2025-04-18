@@ -1,4 +1,5 @@
-import { Button, Card, Flex, Heading, TextField } from "@radix-ui/themes";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { Button, Card, Flex, Heading, IconButton, TextField } from "@radix-ui/themes";
 import {
   json,
   type ActionFunctionArgs,
@@ -7,11 +8,14 @@ import {
 import { Form, useLoaderData } from "@remix-run/react";
 
 import { Fragment } from "react";
+import AddaWeek from "~/components/AddaWeek";
 import { getDivisionseByLeagueSlug } from "~/models/division.server";
 import {
+  addWeekToSchedule,
   createSchedule,
   deleteScheduleByDivisionId,
   getSchedulesByLeagueSlug,
+  deleteWeekToSchedule,
 } from "~/models/schedule.server";
 import { formatDate, getTeamName } from "~/utils";
 
@@ -21,6 +25,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const divisionId = formData.get("divisionId") as string;
   if (action === "delete") {
     return await deleteScheduleByDivisionId(divisionId);
+  }
+
+  if (action === "deleteWeek") {
+    const weekId = formData.get("weekId") as string;
+    const scheduleId = formData.get("scheduleId") as string;
+    return await deleteWeekToSchedule(scheduleId, weekId);
   }
 
   if (action === "create") {
@@ -34,6 +44,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
       leagueId,
       Number(numberOfWeeks),
       startDate,
+    );
+  }
+
+  if (action === "addWeek") {
+    const formDataMatches = formData.get("matches");
+    const matches = JSON.parse(formDataMatches as string);
+
+    return addWeekToSchedule(
+      formData.get("scheduleId") as string,
+      formData.get("weekDate") as string,
+      matches
     );
   }
 }
@@ -63,6 +84,7 @@ export default function AdminSchedules() {
               <Heading size="3" className="w-24">
                 {division.name}
               </Heading>
+              {division.schedule ? <input type="hidden" name="scheduleId" value={division.schedule.id} /> : null}
               <input type="hidden" name="divisionId" value={division.id} />
               {!division.schedule ? (
                 <>
@@ -80,12 +102,14 @@ export default function AdminSchedules() {
                     generate
                   </Button>
                 </>
-              ) : null
-              // <Button color="red" name="_action" value="delete" type="submit">
-              //   delete schedule
-              // </Button>
+              ) :
+
+                <Button color="red" name="_action" value="delete" type="submit">
+                  delete schedule
+                </Button>
               }
             </Flex>
+            <AddaWeek teams={division.teams} />
           </Form>
         ))}
       </Card>
@@ -97,7 +121,17 @@ export default function AdminSchedules() {
           <div>
             {schedule.weeks.map((week) => (
               <div key={week.id} className="my-5">
-                <Heading size="3">{formatDate(week.date)}</Heading>
+                <Flex justify='between'>
+                  <Heading size="3">{formatDate(week.date)}</Heading>
+                  <Form method="post">
+                    <input type="hidden" name="weekId" value={week.id} />
+                    <input type="hidden" name="scheduleId" value={schedule.id} />
+                    <IconButton type="submit" name="_action" value="deleteWeek" variant="surface">
+                      <Cross2Icon />
+                    </IconButton>
+                  </Form>
+                </Flex>
+
                 {week.matches.map((match) => (
                   <Flex key={match.id} gap="2">
                     {match.teams.map((team, index) => (
@@ -116,3 +150,4 @@ export default function AdminSchedules() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-import { Division, League, Schedule } from "@prisma/client";
+import { Division, League, Schedule, Team, Week } from "@prisma/client";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 import { shuffle } from "~/utils";
@@ -46,6 +46,21 @@ export async function createSchedule(
   return getScheduleById(schedule.id);
 }
 
+export async function deleteWeekToSchedule(id: Schedule["id"], weekId: Week["id"]) {
+  return prisma.week.delete({
+    where: { id: weekId },
+  });
+}
+
+export async function addWeekToSchedule(scheduleId: Schedule["id"], date: string, matches: { team1: Team["id"], team2: Team["id"] }[]) {
+  const weekDate = new Date(date + "T08:00:00");
+  const week = await createWeek(weekDate.toISOString(), scheduleId);
+  matches.forEach(async (match) => {
+    await createMatch(week.id, match.team1, match.team2);
+  });
+  return getScheduleById(scheduleId);
+}
+
 export async function getScheduleById(id: Schedule["id"]) {
   return prisma.schedule.findFirst({
     where: { id },
@@ -62,8 +77,15 @@ export async function getSchedulesByLeagueSlug(slug: League["slug"]) {
       league: { slug },
     },
     include: {
-      division: true,
+      division: {
+        include: {
+          teams: true,
+        }
+      },
       weeks: {
+        orderBy: {
+          date: "asc",
+        },
         include: {
           matches: {
             include: {
