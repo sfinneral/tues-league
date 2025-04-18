@@ -15,9 +15,9 @@ interface ScoresSimple {
 
 const getScores = (matches: MatchWithScoresAndTeams[]) => {
   const scores: ScoresSimple[] = [];
-  const weeklyPayout = 250;
-  const firstPlacePercent = 0.8;
-  const secondPlacePercent = 0.2;
+  const weeklyPayout = 225;
+  const firstPlacePercent = 0.777777;
+  const secondPlacePercent = 0.222222;
   matches.forEach((match) => {
     match.scores.forEach((score) => {
       scores.push({

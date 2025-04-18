@@ -115,13 +115,27 @@ export async function getLeagueSlugByUserId(id: User["id"]) {
           league: {
             select: {
               slug: true,
+              startDate: true,
             },
           },
         },
       },
     },
   });
-  return user?.teams[0]?.league.slug;
+
+  if (!user?.teams.length) return null;
+
+  // Sort leagues by startDate in descending order and get the most recent one
+  const mostRecentLeague = user.teams
+    .map(team => team.league)
+    .sort((a, b) => {
+      // Parse dates to ensure proper comparison
+      const dateA = new Date(a.startDate);
+      const dateB = new Date(b.startDate);
+      return dateB.getTime() - dateA.getTime();
+    })[0];
+
+  return mostRecentLeague.slug;
 }
 
 export async function updateUser(

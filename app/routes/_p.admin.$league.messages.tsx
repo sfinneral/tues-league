@@ -105,16 +105,14 @@ export default function LeagueMessages() {
                             ))}
                         </div>
                     ))}
-                    {subs && subs.length > 0 && (
-                        <div>
+                    {subs && subs.length > 0 ? <div>
                             <Heading size="4">Subs</Heading>
                             {subs.map((sub) => (
                                 <div key={sub.id}>
                                     {sub.user.profile?.firstName} {sub.user.profile?.lastName} - {sub.user.profile?.phoneNumber}
                                 </div>
                             ))}
-                        </div>
-                    )}
+                        </div> : null}
                 </Flex>
             </Card>
         </div>
