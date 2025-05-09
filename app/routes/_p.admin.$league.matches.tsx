@@ -5,7 +5,7 @@ import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 
 import Carousel from "~/components/Carousel";
 import { UpdateScore } from "~/components/UpdateScore";
@@ -20,7 +20,7 @@ export async function action({ request }: ActionFunctionArgs) {
     await updateScore(entry[0], Number(entry[1]));
   }
 
-  return {};
+  return json({});
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -34,6 +34,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function AdminMatches() {
   const { schedules } = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   const startIndex = (scheduleId: Schedule["id"]) => {
     const schedule = schedules.find((schedule) => schedule.id === scheduleId);
@@ -76,7 +78,7 @@ export default function AdminMatches() {
                       </Card>
                     ))}
                     <Flex justify="center">
-                      <Button type="submit" className="w-full">
+                      <Button type="submit" className="w-full" loading={isSubmitting}>
                         Save {schedule.division.name} Scores
                       </Button>
                     </Flex>
