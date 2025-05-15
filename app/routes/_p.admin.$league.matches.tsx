@@ -39,9 +39,17 @@ export default function AdminMatches() {
 
   const startIndex = (scheduleId: Schedule["id"]) => {
     const schedule = schedules.find((schedule) => schedule.id === scheduleId);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     return (
       schedule &&
       schedule.weeks.findIndex((week) => {
+        const weekDate = new Date(week.date);
+        weekDate.setHours(0, 0, 0, 0);
+
+        if (weekDate < today) return false;
+
         return week.matches.find((match) => {
           return match.scores.find((score) => !score.score);
         });

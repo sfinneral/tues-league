@@ -21,20 +21,29 @@ export default function LeagueHome() {
 
   const startIndex = (scheduleId: Schedule["id"]) => {
     const schedule = schedules.find((schedule) => schedule.id === scheduleId);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const firstWeekWithoutScores =
       schedule &&
       schedule.weeks.findIndex((week) => {
+        const weekDate = new Date(week.date);
+        weekDate.setHours(0, 0, 0, 0);
+
+        if (weekDate < today) return false;
+
         return week.matches.find((match) => {
           return match.scores.find((score) => !score.score);
         });
       });
+
     if (!schedule || firstWeekWithoutScores === undefined || firstWeekWithoutScores === 0) {
-      return 0
+      return 0;
     }
     if (firstWeekWithoutScores < 0) {
-      return schedule.weeks.length - 1
+      return schedule.weeks.length - 1;
     }
-    return firstWeekWithoutScores - 1
+    return firstWeekWithoutScores - 1;
   };
 
   const outcomeBadge = (scores: Score[], teamId: Team["id"]) => {
