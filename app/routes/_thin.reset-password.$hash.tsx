@@ -12,7 +12,8 @@ import { safeRedirect, validateEmail } from "~/utils";
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(Boolean(params.hash), "Invalid URL");
   if (params.hash) {
-    return json({ hash: params.hash });
+    const decodedHash = decodeURIComponent(params.hash);
+    return json({ hash: decodedHash });
   }
 };
 

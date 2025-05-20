@@ -11,7 +11,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   if (params.email) {
     const { protocol, host } = new URL(request.url);
     const hashedEmail = await bcrypt.hash(params.email, 10);
-    const link = `${protocol}//${host}/reset-password/${hashedEmail}`;
+    const encodedHash = encodeURIComponent(hashedEmail);
+    const link = `${protocol}//${host}/reset-password/${encodedHash}`;
     const { error } = await resend.emails.send({
       from: "Afternoon Golfer <news@mail.afternoongolfer.com>",
       to: [params.email],

@@ -40,13 +40,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (userId) {
     const user = await getUserById(userId);
     const isAdmin = user && process.env.ADMIN_EMAILS?.includes(user.email);
+    const isSteve = user && user.email === "sfinneral@gmail.com";
     const leagueSlug = await getLeagueSlugByUserId(userId);
-    return json({ user, isAdmin, leagueSlug });
+    return json({ user, isAdmin, leagueSlug, isSteve });
   }
 }
 
 export default function Profile() {
-  const { user, isAdmin, leagueSlug } = useLoaderData<typeof loader>();
+  const { user, isAdmin, leagueSlug, isSteve } = useLoaderData<typeof loader>();
   const [isUpdating, setIsUpdating] = useState(false);
   const [firstName, setFirstName] = useState(
     user?.profile?.firstName || undefined,
@@ -136,6 +137,11 @@ export default function Profile() {
             <Link to={`/admin/${leagueSlug}/matches`}>
               <Button>Enter Scores</Button>
             </Link>
+            {isSteve ? (
+              <Link to={`/admin/users`}>
+                <Button>Users</Button>
+              </Link>
+            ) : null}
           </Flex>
         </div>
       ) : null}
