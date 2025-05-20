@@ -32,7 +32,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const firstName = formData.get("firstName");
   const lastName = formData.get("lastName");
-  const email = formData.get("email");
+  const email = (formData.get("email") as string)?.toLowerCase();
   const password = formData.get("password");
   const phoneNumber = formData.get("phoneNumber");
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
