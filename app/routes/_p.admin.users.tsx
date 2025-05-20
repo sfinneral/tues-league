@@ -41,8 +41,8 @@ export default function AdminUsers() {
           <Table.Header>
             <Table.Row>
               <Table.ColumnHeaderCell>user</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>email</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>phone</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell className="hidden md:table-cell">email</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell className="hidden md:table-cell">phone</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
             </Table.Row>
           </Table.Header>
@@ -50,10 +50,19 @@ export default function AdminUsers() {
             {users.map((user) => (
               <Table.Row key={user.id}>
                 <Table.RowHeaderCell>
-                  {user.profile?.firstName} {user.profile?.lastName}
+                  <div className="hidden md:block">
+                    {user.profile?.firstName} {user.profile?.lastName}
+                  </div>
+                  <div className="md:hidden">
+                    {user.profile?.firstName} {user.profile?.lastName}<br />
+                    {user.email}<br />
+                    {formatPhoneNumber(user.profile?.phoneNumber)}
+                  </div>
                 </Table.RowHeaderCell>
-                <Table.Cell>{user.email}</Table.Cell>
-                <Table.Cell>
+                <Table.Cell className="hidden md:table-cell">
+                  {user.email}
+                </Table.Cell>
+                <Table.Cell className="hidden md:table-cell">
                   {formatPhoneNumber(user.profile?.phoneNumber)}
                 </Table.Cell>
                 <Table.Cell>
