@@ -156,3 +156,8 @@ export const formatCurrency = (number = 0) => {
   });
   return usDollar.format(number);
 };
+
+export const roundNumber = (number = 0) => {
+  return Math.round(number);
+};
+

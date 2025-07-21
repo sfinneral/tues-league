@@ -50,10 +50,13 @@ export default function LeagueStandingRow({
         <Table.Cell className="text-center">
           {totalScore(standing.totalScore)}
         </Table.Cell>
+        <Table.Cell className="text-center">
+          {`$${standing.totalAmountWon}`}
+        </Table.Cell>
       </Table.Row>
       {showRecord ? (
         <Table.Row>
-          <Table.Cell colSpan={3}>
+          <Table.Cell colSpan={4}>
             {standing.matchRecord.map((record) => (
               <Flex justify="between" key={record.date} my="1">
                 <Flex>
@@ -73,14 +76,22 @@ export default function LeagueStandingRow({
                       {record.outcome.toUpperCase()}
                     </Badge>
                   </Flex>
+                  <Flex className="w-7" ml="1" justify="center">
+                    <Text color="gray">
+                      {record.amountWon ? `${record.amountWon}` : ' '}
+                    </Text>
+                  </Flex>
                 </Flex>
               </Flex>
             ))}
             <Flex justify="between">
               <Text ml="8">Total</Text>
-              <Text mr="7">{`${totalScore(standing.totalScore)} vs ${totalScore(
+              <Text className="ml-auto">{`${totalScore(standing.totalScore)} vs ${totalScore(
                 standing.totalOpponentScore,
               )}`}</Text>
+              <Flex className="w-16" ml="2" justify="end">
+                <Text>{`$${standing.totalAmountWon}`}</Text>
+              </Flex>
             </Flex>
           </Table.Cell>
         </Table.Row>

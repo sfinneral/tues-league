@@ -87,6 +87,7 @@ export async function getSchedulesByLeagueSlug(slug: League["slug"]) {
           date: "asc",
         },
         include: {
+          winners: true,
           matches: {
             include: {
               scores: true,

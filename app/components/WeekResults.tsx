@@ -1,6 +1,6 @@
 import { Badge, BadgeProps, Card, Flex, Heading } from "@radix-ui/themes";
 import { MatchWithScoresAndTeams } from "~/models/match.server";
-import { formatCurrency, getTeamNameByMatch } from "~/utils";
+import { formatCurrency, getTeamNameByMatch, roundNumber } from "~/utils";
 
 interface WeekResultsProps {
   matches: MatchWithScoresAndTeams[];
@@ -11,9 +11,11 @@ interface ScoresSimple {
   teamName: string;
   place?: string;
   color?: BadgeProps["color"];
+  teamId: string;
+  amountWon?: number;
 }
 
-const getScores = (matches: MatchWithScoresAndTeams[]) => {
+export const getScores = (matches: MatchWithScoresAndTeams[]): ScoresSimple[] => {
   const scores: ScoresSimple[] = [];
   const weeklyPayout = 225;
   const firstPlacePercent = 0.777777;
@@ -23,6 +25,7 @@ const getScores = (matches: MatchWithScoresAndTeams[]) => {
       scores.push({
         score: score.score,
         teamName: getTeamNameByMatch(match, score.teamId),
+        teamId: score.teamId,
       });
     });
   });
@@ -40,12 +43,14 @@ const getScores = (matches: MatchWithScoresAndTeams[]) => {
         scores[i].place = `T1st ${formatCurrency(
           weeklyPayout / amountOf1stTies,
         )}`;
+        scores[i].amountWon = roundNumber(weeklyPayout / amountOf1stTies);
         scores[i].color = "green";
       }
     } else {
       scores[0].place = `1st ${formatCurrency(
         weeklyPayout * firstPlacePercent,
       )}`;
+      scores[0].amountWon = roundNumber(weeklyPayout * firstPlacePercent);
       scores[0].color = "green";
       // if tie for 2nd
       if (scores[1].score === scores[2].score) {
@@ -57,12 +62,14 @@ const getScores = (matches: MatchWithScoresAndTeams[]) => {
           scores[i].place = `T2nd ${formatCurrency(
             (weeklyPayout * secondPlacePercent) / amountOf2ndTies,
           )}`;
+          scores[i].amountWon = roundNumber((weeklyPayout * secondPlacePercent) / amountOf2ndTies);
           scores[i].color = "blue";
         }
       } else {
         scores[1].place = `2nd ${formatCurrency(
           weeklyPayout * secondPlacePercent,
         )}`;
+        scores[1].amountWon = roundNumber(weeklyPayout * secondPlacePercent);
         scores[1].color = "blue";
       }
     }

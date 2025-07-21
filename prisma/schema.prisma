@@ -114,6 +114,7 @@ model Week {
   matches      Match[]
   Schedule     Schedule? @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
   scheduleId   String?
+  winners      Winner[]
 }
 
 model Sub {
@@ -122,4 +123,12 @@ model Sub {
   userId   String
   leagueId String
   league   League @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+}
+
+model Winner {
+  id        String @id @default(cuid())
+  teamId    String
+  amountWon Int
+  week      Week   @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  weekId    String
 }

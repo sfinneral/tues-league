@@ -1,11 +1,52 @@
 import { Schedule, Score, Team } from "@prisma/client";
-import { Badge, Card, Flex, Heading, Separator } from "@radix-ui/themes";
-import { LoaderFunctionArgs, json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { Week, Match } from "@prisma/client";
+import { Badge, Button, Card, Flex, Heading, Separator } from "@radix-ui/themes";
+import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
+import { useLoaderData, useNavigation, useFetcher } from "@remix-run/react";
 import Carousel from "~/components/Carousel";
-import { WeekResults } from "~/components/WeekResults";
+import { getScores, WeekResults } from "~/components/WeekResults";
 import { getSchedulesByLeagueSlug } from "~/models/schedule.server";
-import { formatDate, getTeamNameByMatch } from "~/utils";
+import { saveWinners } from "~/models/week.server";
+import { formatDate, getTeamNameByMatch, roundNumber } from "~/utils";
+
+type MatchWithRelations = Match & {
+  scores: Score[];
+  teams: Team[];
+};
+
+type WeekWithMatches = Week & {
+  matches: MatchWithRelations[];
+};
+
+interface ActionData {
+  success: boolean;
+  error?: string;
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const weekId = formData.get("weekId") as string;
+  const winnersData = formData.get("winners") as string;
+  const winners = JSON.parse(winnersData);
+
+  try {
+    await saveWinners(
+      weekId,
+      winners.map((w: { teamId: string; amountWon: number }) => ({
+        teamId: w.teamId,
+        amountWon: roundNumber(w.amountWon)
+      }))
+    );
+
+    return json<ActionData>({ success: true });
+  } catch (error) {
+    console.error('Failed to save winners:', error);
+    return json<ActionData>(
+      { success: false, error: "Failed to save winners" },
+      { status: 400 }
+    );
+  }
+}
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const leagueSlug = params.league as string;
@@ -18,6 +59,9 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function LeagueHome() {
   const { schedules } = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
+  const fetcher = useFetcher<ActionData>();
+  const isSubmitting = navigation.state === "submitting" || fetcher.state === "submitting";
 
   const startIndex = (scheduleId: Schedule["id"]) => {
     const schedule = schedules.find((schedule) => schedule.id === scheduleId);
@@ -67,6 +111,15 @@ export default function LeagueHome() {
       return null;
     }
   };
+
+  const saveWinners = (week: WeekWithMatches) => {
+    const winners = getScores(week.matches);
+    const form = new FormData();
+    form.append("weekId", week.id);
+    form.append("winners", JSON.stringify(winners));
+    fetcher.submit(form, { method: "post" });
+  };
+
   return (
     <div>
       {schedules?.length ? (
@@ -107,6 +160,15 @@ export default function LeagueHome() {
                       ))}
                     </Card>
                     <WeekResults matches={week.matches} />
+                    <Flex justify="center" my="4" direction="row" gap="2" align="center">
+                      <Button
+                        variant="soft"
+                        onClick={() => saveWinners(week)}
+                        loading={isSubmitting}
+                      >
+                        {'Save Winners'}
+                      </Button>
+                    </Flex>
                   </div>
                 ))}
               </Carousel>

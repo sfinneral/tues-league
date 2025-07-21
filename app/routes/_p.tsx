@@ -56,7 +56,7 @@ export default function ProtectedWrapper() {
             </TabNav.Link>
           ))}
         </TabNav.Root>
-        <main className="p-4 pb-20">
+        <main className="p-2 pb-20">
           <Outlet />
         </main>
       </div>

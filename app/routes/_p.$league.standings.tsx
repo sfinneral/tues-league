@@ -33,6 +33,9 @@ export default function LeagueStandings() {
                   <Table.ColumnHeaderCell className="text-center">
                     Total
                   </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="text-center">
+                    Won
+                  </Table.ColumnHeaderCell>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
