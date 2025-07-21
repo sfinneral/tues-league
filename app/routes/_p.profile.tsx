@@ -8,7 +8,7 @@ import {
 } from "@radix-ui/themes";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, Link, json, redirect, useLoaderData } from "@remix-run/react";
+import { Form, Link, json, redirect, useLoaderData, useRouteLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import {
@@ -39,15 +39,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await getUserId(request);
   if (userId) {
     const user = await getUserById(userId);
-    const isAdmin = user && process.env.ADMIN_EMAILS?.includes(user.email);
-    const isSteve = user && user.email === "sfinneral@gmail.com";
     const leagueSlug = await getLeagueSlugByUserId(userId);
-    return json({ user, isAdmin, leagueSlug, isSteve });
+    return json({ user, leagueSlug });
   }
 }
 
 export default function Profile() {
-  const { user, isAdmin, leagueSlug, isSteve } = useLoaderData<typeof loader>();
+  const { user, leagueSlug } = useLoaderData<typeof loader>();
+  const { isAdmin, isSteve } = useRouteLoaderData("routes/_p") as { isAdmin: boolean, isSteve: boolean };
   const [isUpdating, setIsUpdating] = useState(false);
   const [firstName, setFirstName] = useState(
     user?.profile?.firstName || undefined,

@@ -2,7 +2,7 @@ import { Schedule, Score, Team } from "@prisma/client";
 import type { Week, Match } from "@prisma/client";
 import { Badge, Button, Card, Flex, Heading, Separator } from "@radix-ui/themes";
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { useLoaderData, useNavigation, useFetcher } from "@remix-run/react";
+import { useLoaderData, useNavigation, useFetcher, useRouteLoaderData } from "@remix-run/react";
 import Carousel from "~/components/Carousel";
 import { getScores, WeekResults } from "~/components/WeekResults";
 import { getSchedulesByLeagueSlug } from "~/models/schedule.server";
@@ -59,6 +59,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function LeagueHome() {
   const { schedules } = useLoaderData<typeof loader>();
+  const { isSteve } = useRouteLoaderData("routes/_p") as { isAdmin: boolean, isSteve: boolean };
   const navigation = useNavigation();
   const fetcher = useFetcher<ActionData>();
   const isSubmitting = navigation.state === "submitting" || fetcher.state === "submitting";
@@ -160,7 +161,7 @@ export default function LeagueHome() {
                       ))}
                     </Card>
                     <WeekResults matches={week.matches} />
-                    <Flex justify="center" my="4" direction="row" gap="2" align="center">
+                    {isSteve ? <Flex justify="center" my="4" direction="row" gap="2" align="center">
                       <Button
                         variant="soft"
                         onClick={() => saveWinners(week)}
@@ -168,7 +169,7 @@ export default function LeagueHome() {
                       >
                         {'Save Winners'}
                       </Button>
-                    </Flex>
+                    </Flex> : null}
                   </div>
                 ))}
               </Carousel>

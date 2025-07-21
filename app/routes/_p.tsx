@@ -11,9 +11,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   // check if the user is a member of this league
   if (userId) {
     const user = await getUserById(userId);
+    const isAdmin = user && process.env.ADMIN_EMAILS?.includes(user.email);
+    const isSteve = user && user.email === "sfinneral@gmail.com";
     return json({
       user,
       leagueSlug: params.league || (await getLeagueSlugByUserId(userId)),
+      isAdmin,
+      isSteve,
     });
   } else {
     return redirect("/login");
