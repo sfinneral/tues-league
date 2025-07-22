@@ -167,7 +167,7 @@ export default function LeagueHome() {
                         onClick={() => saveWinners(week)}
                         loading={isSubmitting}
                       >
-                        {'Save Winners'}
+                        {week.winners.length ? 'Update Winners' : 'Save Winners'}
                       </Button>
                     </Flex> : null}
                   </div>

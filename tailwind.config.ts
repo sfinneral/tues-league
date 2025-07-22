@@ -3,7 +3,9 @@ import type { Config } from "tailwindcss";
 export default {
   content: ["./app/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    extend: {},
+    screens: {
+      'sm': '520px',
+    }
   },
   plugins: [],
 } satisfies Config;

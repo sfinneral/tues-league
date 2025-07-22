@@ -44,7 +44,7 @@ export default function ProtectedWrapper() {
   ];
   return (
     <Flex justify="center">
-      <div className="h-full max-w-5xl">
+      <div className="h-full max-w-7xl">
         {user?.profile?.firstName ? (
           <TopBanner firstName={user.profile?.firstName} />
         ) : null}
