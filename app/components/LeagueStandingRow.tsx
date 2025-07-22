@@ -19,14 +19,10 @@ export default function LeagueStandingRow({
     const currentPoints = standing.points;
     const samePoints = allStandings.filter(s => s.points === currentPoints).length > 1;
 
-    // Find how many unique point values are higher than current
-    const higherPoints = new Set(
-      allStandings
-        .filter(s => s.points > currentPoints)
-        .map(s => s.points)
-    ).size;
+    // Count all teams with higher points
+    const teamsAbove = allStandings.filter(s => s.points > currentPoints).length;
 
-    const place = higherPoints + 1;
+    const place = teamsAbove + 1;
     return samePoints ? `T${place}` : place.toString();
   };
 
