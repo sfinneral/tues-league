@@ -137,10 +137,16 @@ export default function Profile() {
               <Button>Enter Scores</Button>
             </Link>
             {isSteve ? (
-              <Link to={`/admin/users`}>
-                <Button>Users</Button>
-              </Link>
+              <>
+                <Link to={`/admin/users`}>
+                  <Button>Users</Button>
+                </Link>
+                <Link to={`/admin/${leagueSlug}/playoffs`}>
+                  <Button>Playoffs</Button>
+                </Link>
+              </>
             ) : null}
+
           </Flex>
         </div>
       ) : null}

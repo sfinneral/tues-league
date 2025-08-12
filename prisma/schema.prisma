@@ -46,16 +46,25 @@ model Course {
 }
 
 model League {
-  id        String     @id @default(cuid())
-  name      String
-  startDate String
-  slug      String     @unique
-  courseId  String
-  course    Course     @relation(fields: [courseId], references: [id])
-  divisions Division[]
-  schedule  Schedule[]
-  teams     Team[]
-  subs      Sub[]
+  id             String         @id @default(cuid())
+  name           String
+  startDate      String
+  slug           String         @unique
+  courseId       String
+  course         Course         @relation(fields: [courseId], references: [id])
+  divisions      Division[]
+  schedule       Schedule[]
+  teams          Team[]
+  subs           Sub[]
+  playoffMatches PlayoffMatch[]
+}
+
+model PlayoffMatch {
+  id            String @id @default(cuid())
+  teams         Team[]
+  bracketNumber Int
+  leagueId      String
+  league        League @relation(fields: [leagueId], references: [id])
 }
 
 model Division {
@@ -73,10 +82,12 @@ model Team {
   matches Match[]
   scores  Score[]
 
-  division   Division @relation(fields: [divisionId], references: [id])
-  divisionId String
-  leagueId   String
-  league     League   @relation(fields: [leagueId], references: [id])
+  division       Division      @relation(fields: [divisionId], references: [id])
+  divisionId     String
+  leagueId       String
+  league         League        @relation(fields: [leagueId], references: [id])
+  PlayoffMatch   PlayoffMatch? @relation(fields: [playoffMatchId], references: [id])
+  playoffMatchId String?
 }
 
 model Match {

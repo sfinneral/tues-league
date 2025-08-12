@@ -28,7 +28,7 @@ export default function ProtectedWrapper() {
   const { leagueSlug, user } = useLoaderData<typeof loader>();
   const location = useLocation();
 
-  const navItems = [
+  const navItems: { text: string; href: string; className?: string }[] = [
     {
       text: "Schedule & Scores",
       href: `/${leagueSlug}`,
@@ -41,6 +41,11 @@ export default function ProtectedWrapper() {
       text: "Members",
       href: `/${leagueSlug}/members`,
     },
+    {
+      text: "Playoffs",
+      href: `/${leagueSlug}/playoffs`,
+      className: "hidden sm:block"
+    },
   ];
   return (
     <Flex justify="center">
@@ -51,13 +56,14 @@ export default function ProtectedWrapper() {
 
         <TabNav.Root m="3">
           {navItems.map((navItem) => (
-            <TabNav.Link
-              key={navItem.text}
-              href={navItem.href}
-              active={location.pathname === navItem.href}
-            >
-              {navItem.text}
-            </TabNav.Link>
+            <div key={navItem.text} className={navItem.className}>
+              <TabNav.Link
+                href={navItem.href}
+                active={location.pathname === navItem.href}
+              >
+                {navItem.text}
+              </TabNav.Link>
+            </div>
           ))}
         </TabNav.Root>
         <main className="p-2 pb-20">
