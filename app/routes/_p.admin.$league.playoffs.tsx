@@ -26,16 +26,29 @@ export async function action({ request, params }: ActionFunctionArgs) {
         where: {
             leagueId: league.id,
             bracketNumber
+        },
+        include: {
+            teams: true
         }
     });
 
     if (existingMatch) {
-        // Update existing match
+        // First disconnect existing teams
         await prisma.playoffMatch.update({
             where: { id: existingMatch.id },
             data: {
                 teams: {
-                    set: [{ id: team1Id }, { id: team2Id }]
+                    disconnect: existingMatch.teams.map(team => ({ id: team.id }))
+                }
+            }
+        });
+
+        // Then connect new teams
+        await prisma.playoffMatch.update({
+            where: { id: existingMatch.id },
+            data: {
+                teams: {
+                    connect: [{ id: team1Id }, { id: team2Id }]
                 }
             }
         });

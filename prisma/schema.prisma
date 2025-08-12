@@ -82,12 +82,11 @@ model Team {
   matches Match[]
   scores  Score[]
 
-  division       Division      @relation(fields: [divisionId], references: [id])
+  division       Division       @relation(fields: [divisionId], references: [id])
   divisionId     String
   leagueId       String
-  league         League        @relation(fields: [leagueId], references: [id])
-  PlayoffMatch   PlayoffMatch? @relation(fields: [playoffMatchId], references: [id])
-  playoffMatchId String?
+  league         League         @relation(fields: [leagueId], references: [id])
+  playoffMatches PlayoffMatch[]
 }
 
 model Match {
