@@ -2,7 +2,7 @@
 
 stored in https://fly.io/apps/tues-league-bf86/secrets
 
-## connecting to server
+## connect to server
 
 `fly ssh console -a tues-league-bf86`
 `fly ssh console -a tues-league-bf86-staging`
