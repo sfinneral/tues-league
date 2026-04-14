@@ -15,7 +15,9 @@ interface ScoresSimple {
   amountWon?: number;
 }
 
-export const getScores = (matches: MatchWithScoresAndTeams[]): ScoresSimple[] => {
+export const getScores = (
+  matches: MatchWithScoresAndTeams[],
+): ScoresSimple[] => {
   const scores: ScoresSimple[] = [];
   const weeklyPayout = 225;
   const firstPlacePercent = 0.777777;
@@ -62,7 +64,9 @@ export const getScores = (matches: MatchWithScoresAndTeams[]): ScoresSimple[] =>
           scores[i].place = `T2nd ${formatCurrency(
             (weeklyPayout * secondPlacePercent) / amountOf2ndTies,
           )}`;
-          scores[i].amountWon = roundNumber((weeklyPayout * secondPlacePercent) / amountOf2ndTies);
+          scores[i].amountWon = roundNumber(
+            (weeklyPayout * secondPlacePercent) / amountOf2ndTies,
+          );
           scores[i].color = "blue";
         }
       } else {

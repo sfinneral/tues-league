@@ -41,8 +41,12 @@ export default function AdminUsers() {
           <Table.Header>
             <Table.Row>
               <Table.ColumnHeaderCell>user</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell className="hidden md:table-cell">email</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell className="hidden md:table-cell">phone</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell className="hidden md:table-cell">
+                email
+              </Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell className="hidden md:table-cell">
+                phone
+              </Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
             </Table.Row>
           </Table.Header>
@@ -54,8 +58,10 @@ export default function AdminUsers() {
                     {user.profile?.firstName} {user.profile?.lastName}
                   </div>
                   <div className="md:hidden">
-                    {user.profile?.firstName} {user.profile?.lastName}<br />
-                    {user.email}<br />
+                    {user.profile?.firstName} {user.profile?.lastName}
+                    <br />
+                    {user.email}
+                    <br />
                     {formatPhoneNumber(user.profile?.phoneNumber)}
                   </div>
                 </Table.RowHeaderCell>

@@ -11,16 +11,19 @@ interface LeagueStandingRowProps {
 
 export default function LeagueStandingRow({
   standing,
-  allStandings
+  allStandings,
 }: LeagueStandingRowProps) {
   const [showRecord, setShowRecord] = useState(false);
 
   const getPlace = () => {
     const currentPoints = standing.points;
-    const samePoints = allStandings.filter(s => s.points === currentPoints).length > 1;
+    const samePoints =
+      allStandings.filter((s) => s.points === currentPoints).length > 1;
 
     // Count all teams with higher points
-    const teamsAbove = allStandings.filter(s => s.points > currentPoints).length;
+    const teamsAbove = allStandings.filter(
+      (s) => s.points > currentPoints,
+    ).length;
 
     const place = teamsAbove + 1;
     return samePoints ? `T${place}` : place.toString();
@@ -44,9 +47,7 @@ export default function LeagueStandingRow({
         onClick={() => setShowRecord(!showRecord)}
         className="cursor-pointer"
       >
-        <Table.Cell className="sm:table-cell hidden">
-          {getPlace()}
-        </Table.Cell>
+        <Table.Cell className="sm:table-cell hidden">{getPlace()}</Table.Cell>
         <Table.RowHeaderCell>
           <Flex align="center">
             {showRecord ? (
@@ -75,11 +76,13 @@ export default function LeagueStandingRow({
         <Table.Cell className="text-center  sm:table-cell hidden">
           {`$${standing.totalAmountWon}`}
         </Table.Cell>
-
       </Table.Row>
       {showRecord ? (
         <Table.Row>
-          <Table.Cell className="[&[colspan]]:col-span-3 sm:[&[colspan]]:col-span-7" colSpan={7}>
+          <Table.Cell
+            className="[&[colspan]]:col-span-3 sm:[&[colspan]]:col-span-7"
+            colSpan={7}
+          >
             {standing.matchRecord.map((record) => (
               <Flex justify="between" key={record.date} my="1">
                 <Flex>
@@ -103,10 +106,12 @@ export default function LeagueStandingRow({
                     ml="1"
                     justify="end"
                     className="w-8"
-                    display={{ initial: 'none', xs: 'flex' }}
+                    display={{ initial: "none", xs: "flex" }}
                   >
                     <Text color="gray">
-                      {record.amountWon ? `${formatCurrency(record.amountWon)}` : ' '}
+                      {record.amountWon
+                        ? `${formatCurrency(record.amountWon)}`
+                        : " "}
                     </Text>
                   </Flex>
                 </Flex>
@@ -114,10 +119,15 @@ export default function LeagueStandingRow({
             ))}
             <Flex justify="between">
               <Text ml="8">Total</Text>
-              <Text className="ml-auto mr-10 sm:mr-0">{`${totalScore(standing.totalScore)} vs ${totalScore(
-                standing.totalOpponentScore,
-              )}`}</Text>
-              <Flex className="w-16" ml="2" justify="end" display={{ initial: 'none', xs: 'flex' }}>
+              <Text className="ml-auto mr-10 sm:mr-0">{`${totalScore(
+                standing.totalScore,
+              )} vs ${totalScore(standing.totalOpponentScore)}`}</Text>
+              <Flex
+                className="w-16"
+                ml="2"
+                justify="end"
+                display={{ initial: "none", xs: "flex" }}
+              >
                 <Text>{`$${standing.totalAmountWon}`}</Text>
               </Flex>
             </Flex>

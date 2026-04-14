@@ -4,8 +4,8 @@ export default {
   content: ["./app/**/*.{js,jsx,ts,tsx}"],
   theme: {
     screens: {
-      'sm': '520px',
-    }
+      sm: "520px",
+    },
   },
   plugins: [],
 } satisfies Config;

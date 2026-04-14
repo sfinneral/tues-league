@@ -18,9 +18,11 @@ export default function LeagueStandings() {
   const { leagueStandings } = useLoaderData<typeof loader>();
   const { isSteve } = useRouteLoaderData("routes/_p") as { isSteve: boolean };
   const getTotalAmountWon = (standings: Standing[]) => {
-    return formatCurrency(standings.reduce((acc, standing) => {
-      return acc + (standing.totalAmountWon || 0);
-    }, 0));
+    return formatCurrency(
+      standings.reduce((acc, standing) => {
+        return acc + (standing.totalAmountWon || 0);
+      }, 0),
+    );
   };
 
   return (
@@ -34,7 +36,9 @@ export default function LeagueStandings() {
             <Table.Root size="1">
               <Table.Header>
                 <Table.Row>
-                  <Table.ColumnHeaderCell className="sm:table-cell hidden">{' '}</Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="sm:table-cell hidden">
+                    {" "}
+                  </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell>Team</Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell className="text-center">
                     Record
@@ -42,7 +46,9 @@ export default function LeagueStandings() {
                   <Table.ColumnHeaderCell className="text-center">
                     Total
                   </Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell className="text-center sm:table-cell hidden">Points</Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="text-center sm:table-cell hidden">
+                    Points
+                  </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell className="text-center sm:table-cell hidden">
                     Won
                   </Table.ColumnHeaderCell>
@@ -58,9 +64,22 @@ export default function LeagueStandings() {
                 ))}
               </Table.Body>
             </Table.Root>
-            {isSteve ? <Flex justify="between" p="2" display={{ initial: 'none', xs: 'flex' }}>
-              <Text size="2">{`${leagueStanding.standings[0].matchRecord.length} weeks x 225 = ${formatCurrency(leagueStanding.standings[0].matchRecord.length * 225)}`}</Text>
-              <Text size="2">{getTotalAmountWon(leagueStanding.standings)}</Text></Flex> : null}
+            {isSteve && leagueStanding?.standings[0]?.matchRecord ? (
+              <Flex
+                justify="between"
+                p="2"
+                display={{ initial: "none", xs: "flex" }}
+              >
+                <Text size="2">{`${
+                  leagueStanding.standings[0].matchRecord.length
+                } weeks x 225 = ${formatCurrency(
+                  leagueStanding.standings[0].matchRecord.length * 225,
+                )}`}</Text>
+                <Text size="2">
+                  {getTotalAmountWon(leagueStanding.standings)}
+                </Text>
+              </Flex>
+            ) : null}
             <br />
           </Card>
         ))

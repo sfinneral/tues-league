@@ -1,5 +1,12 @@
 import { Cross2Icon } from "@radix-ui/react-icons";
-import { Button, Card, Flex, Heading, IconButton, TextField } from "@radix-ui/themes";
+import {
+  Button,
+  Card,
+  Flex,
+  Heading,
+  IconButton,
+  TextField,
+} from "@radix-ui/themes";
 import {
   json,
   type ActionFunctionArgs,
@@ -54,7 +61,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return addWeekToSchedule(
       formData.get("scheduleId") as string,
       formData.get("weekDate") as string,
-      matches
+      matches,
     );
   }
 }
@@ -84,7 +91,13 @@ export default function AdminSchedules() {
               <Heading size="3" className="w-24">
                 {division.name}
               </Heading>
-              {division.schedule ? <input type="hidden" name="scheduleId" value={division.schedule.id} /> : null}
+              {division.schedule ? (
+                <input
+                  type="hidden"
+                  name="scheduleId"
+                  value={division.schedule.id}
+                />
+              ) : null}
               <input type="hidden" name="divisionId" value={division.id} />
               {!division.schedule ? (
                 <>
@@ -102,12 +115,11 @@ export default function AdminSchedules() {
                     generate
                   </Button>
                 </>
-              ) :
-
+              ) : (
                 <Button color="red" name="_action" value="delete" type="submit">
                   delete schedule
                 </Button>
-              }
+              )}
             </Flex>
             <AddaWeek teams={division.teams} />
           </Form>
@@ -121,12 +133,21 @@ export default function AdminSchedules() {
           <div>
             {schedule.weeks.map((week) => (
               <div key={week.id} className="my-5">
-                <Flex justify='between'>
+                <Flex justify="between">
                   <Heading size="3">{formatDate(week.date)}</Heading>
                   <Form method="post">
                     <input type="hidden" name="weekId" value={week.id} />
-                    <input type="hidden" name="scheduleId" value={schedule.id} />
-                    <IconButton type="submit" name="_action" value="deleteWeek" variant="surface">
+                    <input
+                      type="hidden"
+                      name="scheduleId"
+                      value={schedule.id}
+                    />
+                    <IconButton
+                      type="submit"
+                      name="_action"
+                      value="deleteWeek"
+                      variant="surface"
+                    >
                       <Cross2Icon />
                     </IconButton>
                   </Form>
@@ -150,4 +171,3 @@ export default function AdminSchedules() {
     </div>
   );
 }
-

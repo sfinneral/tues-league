@@ -160,4 +160,3 @@ export const formatCurrency = (number = 0) => {
 export const roundNumber = (number = 0) => {
   return Math.round(number);
 };
-

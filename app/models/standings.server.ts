@@ -76,13 +76,15 @@ export const getStandingsBySlug = async (leagueSlug: League["slug"]) => {
     } else if (outcome === "ties") {
       t && t.points++;
     }
-    const amountWon = winners?.filter((winner) => winner.teamId === t?.teamId).reduce((acc, winner) => acc + winner.amountWon, 0);
+    const amountWon = winners
+      ?.filter((winner) => winner.teamId === t?.teamId)
+      .reduce((acc, winner) => acc + winner.amountWon, 0);
     t?.matchRecord.push({
       outcome: outcome.charAt(0) as Outcome,
       opponent,
       date,
       teamScore: score.score,
-      amountWon
+      amountWon,
     });
     if (t && score.score) {
       t.totalScore = t.totalScore + score.score;
@@ -120,27 +122,55 @@ export const getStandingsBySlug = async (leagueSlug: League["slug"]) => {
           if (isNewTeam(scheduleIndex, team2Score))
             newTeam(scheduleIndex, team2Score, team2Name);
           if (team1Score.score === team2Score.score) {
-            recordOutcome(scheduleIndex, team1Score, "ties", team2, week.date, week.winners);
-            recordOutcome(scheduleIndex, team2Score, "ties", team1, week.date, week.winners);
+            recordOutcome(
+              scheduleIndex,
+              team1Score,
+              "ties",
+              team2,
+              week.date,
+              week.winners,
+            );
+            recordOutcome(
+              scheduleIndex,
+              team2Score,
+              "ties",
+              team1,
+              week.date,
+              week.winners,
+            );
           } else if (team1Score.score >= team2Score.score) {
-            recordOutcome(scheduleIndex, team2Score, "wins", team1, week.date, week.winners);
+            recordOutcome(
+              scheduleIndex,
+              team2Score,
+              "wins",
+              team1,
+              week.date,
+              week.winners,
+            );
             recordOutcome(
               scheduleIndex,
               team1Score,
               "losses",
               team2,
               week.date,
-              week.winners
+              week.winners,
             );
           } else {
-            recordOutcome(scheduleIndex, team1Score, "wins", team2, week.date, week.winners);
+            recordOutcome(
+              scheduleIndex,
+              team1Score,
+              "wins",
+              team2,
+              week.date,
+              week.winners,
+            );
             recordOutcome(
               scheduleIndex,
               team2Score,
               "losses",
               team1,
               week.date,
-              week.winners
+              week.winners,
             );
           }
         }

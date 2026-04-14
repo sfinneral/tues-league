@@ -9,6 +9,9 @@ export async function loader() {
     return json({ status: "ok" }, { status: 200 });
   } catch (error) {
     console.error("Health check failed:", error);
-    return json({ status: "error", error: "Database connection failed" }, { status: 500 });
+    return json(
+      { status: "error", error: "Database connection failed" },
+      { status: 500 },
+    );
   }
 }

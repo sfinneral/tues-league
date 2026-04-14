@@ -23,7 +23,7 @@ export function createWeek(date: Week["date"], scheduleId: Schedule["id"]) {
 export async function saveWinners(weekId: Week["id"], winners: WinnerData[]) {
   // Delete existing winners
   await prisma.winner.deleteMany({
-    where: { weekId }
+    where: { weekId },
   });
 
   // Create new winners
@@ -34,9 +34,9 @@ export async function saveWinners(weekId: Week["id"], winners: WinnerData[]) {
         data: {
           teamId: w.teamId,
           amountWon: w.amountWon,
-          weekId
-        }
-      })
+          weekId,
+        },
+      }),
     );
 
   if (winnerPromises.length > 0) {

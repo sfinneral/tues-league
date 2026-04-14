@@ -86,7 +86,11 @@ export default function AdminMatches() {
                       </Card>
                     ))}
                     <Flex justify="center">
-                      <Button type="submit" className="w-full" loading={isSubmitting}>
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        loading={isSubmitting}
+                      >
                         Save {schedule.division.name} Scores
                       </Button>
                     </Flex>

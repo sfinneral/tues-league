@@ -46,13 +46,20 @@ export async function createSchedule(
   return getScheduleById(schedule.id);
 }
 
-export async function deleteWeekToSchedule(id: Schedule["id"], weekId: Week["id"]) {
+export async function deleteWeekToSchedule(
+  id: Schedule["id"],
+  weekId: Week["id"],
+) {
   return prisma.week.delete({
     where: { id: weekId },
   });
 }
 
-export async function addWeekToSchedule(scheduleId: Schedule["id"], date: string, matches: { team1: Team["id"], team2: Team["id"] }[]) {
+export async function addWeekToSchedule(
+  scheduleId: Schedule["id"],
+  date: string,
+  matches: { team1: Team["id"]; team2: Team["id"] }[],
+) {
   const weekDate = new Date(date + "T08:00:00");
   const week = await createWeek(weekDate.toISOString(), scheduleId);
   matches.forEach(async (match) => {
@@ -80,7 +87,7 @@ export async function getSchedulesByLeagueSlug(slug: League["slug"]) {
       division: {
         include: {
           teams: true,
-        }
+        },
       },
       weeks: {
         orderBy: {

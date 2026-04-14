@@ -8,7 +8,14 @@ import {
 } from "@radix-ui/themes";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, Link, json, redirect, useLoaderData, useRouteLoaderData } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  json,
+  redirect,
+  useLoaderData,
+  useRouteLoaderData,
+} from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import {
@@ -46,7 +53,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Profile() {
   const { user, leagueSlug } = useLoaderData<typeof loader>();
-  const { isAdmin, isSteve } = useRouteLoaderData("routes/_p") as { isAdmin: boolean, isSteve: boolean };
+  const { isAdmin, isSteve } = useRouteLoaderData("routes/_p") as {
+    isAdmin: boolean;
+    isSteve: boolean;
+  };
   const [isUpdating, setIsUpdating] = useState(false);
   const [firstName, setFirstName] = useState(
     user?.profile?.firstName || undefined,
@@ -146,7 +156,6 @@ export default function Profile() {
                 </Link>
               </>
             ) : null}
-
           </Flex>
         </div>
       ) : null}

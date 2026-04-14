@@ -1,8 +1,20 @@
 import { Schedule, Score, Team } from "@prisma/client";
 import type { Week, Match } from "@prisma/client";
-import { Badge, Button, Card, Flex, Heading, Separator } from "@radix-ui/themes";
+import {
+  Badge,
+  Button,
+  Card,
+  Flex,
+  Heading,
+  Separator,
+} from "@radix-ui/themes";
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { useLoaderData, useNavigation, useFetcher, useRouteLoaderData } from "@remix-run/react";
+import {
+  useLoaderData,
+  useNavigation,
+  useFetcher,
+  useRouteLoaderData,
+} from "@remix-run/react";
 import Carousel from "~/components/Carousel";
 import { getScores, WeekResults } from "~/components/WeekResults";
 import { getSchedulesByLeagueSlug } from "~/models/schedule.server";
@@ -34,16 +46,16 @@ export async function action({ request }: ActionFunctionArgs) {
       weekId,
       winners.map((w: { teamId: string; amountWon: number }) => ({
         teamId: w.teamId,
-        amountWon: roundNumber(w.amountWon)
-      }))
+        amountWon: roundNumber(w.amountWon),
+      })),
     );
 
     return json<ActionData>({ success: true });
   } catch (error) {
-    console.error('Failed to save winners:', error);
+    console.error("Failed to save winners:", error);
     return json<ActionData>(
       { success: false, error: "Failed to save winners" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }
@@ -59,10 +71,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function LeagueHome() {
   const { schedules } = useLoaderData<typeof loader>();
-  const { isSteve } = useRouteLoaderData("routes/_p") as { isAdmin: boolean, isSteve: boolean };
+  const { isSteve } = useRouteLoaderData("routes/_p") as {
+    isAdmin: boolean;
+    isSteve: boolean;
+  };
   const navigation = useNavigation();
   const fetcher = useFetcher<ActionData>();
-  const isSubmitting = navigation.state === "submitting" || fetcher.state === "submitting";
+  const isSubmitting =
+    navigation.state === "submitting" || fetcher.state === "submitting";
 
   const startIndex = (scheduleId: Schedule["id"]) => {
     const schedule = schedules.find((schedule) => schedule.id === scheduleId);
@@ -82,7 +98,11 @@ export default function LeagueHome() {
         });
       });
 
-    if (!schedule || firstWeekWithoutScores === undefined || firstWeekWithoutScores === 0) {
+    if (
+      !schedule ||
+      firstWeekWithoutScores === undefined ||
+      firstWeekWithoutScores === 0
+    ) {
       return 0;
     }
     if (firstWeekWithoutScores < 0) {
@@ -161,15 +181,25 @@ export default function LeagueHome() {
                       ))}
                     </Card>
                     <WeekResults matches={week.matches} />
-                    {isSteve ? <Flex justify="center" my="4" direction="row" gap="2" align="center">
-                      <Button
-                        variant="soft"
-                        onClick={() => saveWinners(week)}
-                        loading={isSubmitting}
+                    {isSteve ? (
+                      <Flex
+                        justify="center"
+                        my="4"
+                        direction="row"
+                        gap="2"
+                        align="center"
                       >
-                        {week.winners.length ? 'Update Winners' : 'Save Winners'}
-                      </Button>
-                    </Flex> : null}
+                        <Button
+                          variant="soft"
+                          onClick={() => saveWinners(week)}
+                          loading={isSubmitting}
+                        >
+                          {week.winners.length
+                            ? "Update Winners"
+                            : "Save Winners"}
+                        </Button>
+                      </Flex>
+                    ) : null}
                   </div>
                 ))}
               </Carousel>

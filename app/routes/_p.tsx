@@ -44,7 +44,7 @@ export default function ProtectedWrapper() {
     {
       text: "Playoffs",
       href: `/${leagueSlug}/playoffs`,
-      className: "hidden sm:block"
+      className: "hidden sm:block",
     },
   ];
   return (

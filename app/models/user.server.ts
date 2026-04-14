@@ -127,7 +127,7 @@ export async function getLeagueSlugByUserId(id: User["id"]) {
 
   // Sort leagues by startDate in descending order and get the most recent one
   const mostRecentLeague = user.teams
-    .map(team => team.league)
+    .map((team) => team.league)
     .sort((a, b) => {
       // Parse dates to ensure proper comparison
       const dateA = new Date(a.startDate);
