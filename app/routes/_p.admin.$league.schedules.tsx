@@ -12,10 +12,11 @@ import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData, useSubmit } from "@remix-run/react";
 
 import { Fragment } from "react";
 import AddaWeek from "~/components/AddaWeek";
+import { ConfirmDialog } from "~/components/ConfirmDialog";
 import { getDivisionseByLeagueSlug } from "~/models/division.server";
 import {
   addWeekToSchedule,
@@ -80,49 +81,57 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function AdminSchedules() {
   const { divisions, schedules } = useLoaderData<typeof loader>();
+  const submit = useSubmit();
 
   return (
     <div>
       <Heading mb="4">Schedules</Heading>
       <Card mb="8">
         {divisions.map((division) => (
-          <Form key={division.id} method="post">
+          <div key={division.id}>
             <Flex gap="3" className="my-3 align-middle">
               <Heading size="3" className="w-24">
                 {division.name}
               </Heading>
-              {division.schedule ? (
-                <input
-                  type="hidden"
-                  name="scheduleId"
-                  value={division.schedule.id}
-                />
-              ) : null}
-              <input type="hidden" name="divisionId" value={division.id} />
               {!division.schedule ? (
-                <>
-                  <TextField.Root
-                    placeholder="# of weeks"
-                    name="numberOfWeeks"
-                  />
-
-                  <TextField.Root
-                    placeholder="start date"
-                    type="date"
-                    name="startDate"
-                  />
-                  <Button type="submit" name="_action" value="create">
-                    generate
-                  </Button>
-                </>
+                <Form method="post">
+                  <Flex gap="3">
+                    <input
+                      type="hidden"
+                      name="divisionId"
+                      value={division.id}
+                    />
+                    <TextField.Root
+                      placeholder="# of weeks"
+                      name="numberOfWeeks"
+                    />
+                    <TextField.Root
+                      placeholder="start date"
+                      type="date"
+                      name="startDate"
+                    />
+                    <Button type="submit" name="_action" value="create">
+                      generate
+                    </Button>
+                  </Flex>
+                </Form>
               ) : (
-                <Button color="red" name="_action" value="delete" type="submit">
-                  delete schedule
-                </Button>
+                <ConfirmDialog
+                  title="Delete Schedule"
+                  description={`Are you sure you want to delete the schedule for division "${division.name}"? This action cannot be undone.`}
+                  confirmLabel="Delete"
+                  trigger={<Button color="red">delete schedule</Button>}
+                  onConfirm={() => {
+                    const formData = new FormData();
+                    formData.set("_action", "delete");
+                    formData.set("divisionId", division.id);
+                    submit(formData, { method: "post" });
+                  }}
+                />
               )}
             </Flex>
             <AddaWeek teams={division.teams} />
-          </Form>
+          </div>
         ))}
       </Card>
 

@@ -8,9 +8,15 @@ import {
   TextField,
 } from "@radix-ui/themes";
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useSubmit,
+} from "@remix-run/react";
 import { useEffect, useRef } from "react";
 import invariant from "tiny-invariant";
+import { ConfirmDialog } from "~/components/ConfirmDialog";
 import {
   createDivision,
   deleteDivisionById,
@@ -52,6 +58,7 @@ export default function AdminDivisions() {
   const { divisions } = useLoaderData<typeof loader>();
   const formRef = useRef<HTMLFormElement>(null);
   const actionData = useActionData<typeof action>();
+  const submit = useSubmit();
   useEffect(() => {
     formRef.current?.reset();
   }, [actionData]);
@@ -61,21 +68,25 @@ export default function AdminDivisions() {
 
       <section>
         {divisions.map((division) => (
-          <Form method="post" ref={formRef} key={division.id}>
-            <Flex gap="4" my="4">
-              <div>{division.name}</div>
-              <input type="hidden" name="divisionId" value={division.id} />
-              <IconButton
-                color="red"
-                name="_action"
-                value="delete"
-                type="submit"
-                variant="solid"
-              >
-                <Cross2Icon />
-              </IconButton>
-            </Flex>
-          </Form>
+          <Flex gap="4" my="4" key={division.id}>
+            <div>{division.name}</div>
+            <ConfirmDialog
+              title="Delete Division"
+              description={`Are you sure you want to delete "${division.name}"? This action cannot be undone.`}
+              confirmLabel="Delete"
+              trigger={
+                <IconButton color="red" variant="solid">
+                  <Cross2Icon />
+                </IconButton>
+              }
+              onConfirm={() => {
+                const formData = new FormData();
+                formData.set("_action", "delete");
+                formData.set("divisionId", division.id);
+                submit(formData, { method: "post" });
+              }}
+            />
+          </Flex>
         ))}
       </section>
 

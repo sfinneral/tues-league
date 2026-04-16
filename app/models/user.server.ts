@@ -40,7 +40,21 @@ export async function getUserByEmail(email: User["email"]) {
 
 export async function getAllUsers() {
   return prisma.user.findMany({
-    select: { profile: true, email: true, id: true },
+    select: {
+      profile: true,
+      email: true,
+      id: true,
+      teams: {
+        select: {
+          league: { select: { name: true } },
+        },
+      },
+      subs: {
+        select: {
+          league: { select: { name: true } },
+        },
+      },
+    },
   });
 }
 
