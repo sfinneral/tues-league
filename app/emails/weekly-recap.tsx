@@ -254,7 +254,8 @@ export default function WeeklyRecapEmail({
             </Section>
           ))}
 
-          {nextWeek ? <Section>
+          {nextWeek ? (
+            <Section>
               <Text style={divisionHeading}>Next Week — {nextWeek.date}</Text>
               {nextWeek.divisions.map((division) => (
                 <div key={division.name}>
@@ -268,7 +269,8 @@ export default function WeeklyRecapEmail({
                   </div>
                 </div>
               ))}
-            </Section> : null}
+            </Section>
+          ) : null}
 
           <Text style={footer}>Tuesday Twi League</Text>
         </Container>

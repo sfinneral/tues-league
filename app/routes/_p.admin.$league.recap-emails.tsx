@@ -292,19 +292,23 @@ export default function RecapEmails() {
     <div>
       <Heading mb="4">Recap Emails</Heading>
 
-      {actionData?.success && !isSubmitting ? <Callout.Root color="green" mb="4">
+      {actionData?.success && !isSubmitting ? (
+        <Callout.Root color="green" mb="4">
           <Callout.Icon>
             <CheckCircledIcon />
           </Callout.Icon>
           <Callout.Text>Recap email sent successfully!</Callout.Text>
-        </Callout.Root> : null}
+        </Callout.Root>
+      ) : null}
 
-      {actionData?.error && !isSubmitting ? <Callout.Root color="red" mb="4">
+      {actionData?.error && !isSubmitting ? (
+        <Callout.Root color="red" mb="4">
           <Callout.Icon>
             <CrossCircledIcon />
           </Callout.Icon>
           <Callout.Text>{actionData.error}</Callout.Text>
-        </Callout.Root> : null}
+        </Callout.Root>
+      ) : null}
 
       <Flex direction="column" gap="3">
         {weekStatuses.map((week) => {
@@ -327,7 +331,8 @@ export default function RecapEmails() {
                       {week.allWinnersSaved ? "Winners saved" : "No winners"}
                     </Badge>
                   </Flex>
-                  {week.sentAt ? <Text size="1" color="gray">
+                  {week.sentAt ? (
+                    <Text size="1" color="gray">
                       <EnvelopeClosedIcon
                         style={{
                           display: "inline",
@@ -342,7 +347,8 @@ export default function RecapEmails() {
                         hour: "numeric",
                         minute: "2-digit",
                       })}
-                    </Text> : null}
+                    </Text>
+                  ) : null}
                 </Flex>
                 {week.sentAt ? (
                   <Button

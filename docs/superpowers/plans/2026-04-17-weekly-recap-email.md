@@ -395,7 +395,8 @@ export default function WeeklyRecapEmail({
             </Section>
           ))}
 
-          {nextWeek ? <Section>
+          {nextWeek ? (
+            <Section>
               <Text style={divisionHeading}>Next Week — {nextWeek.date}</Text>
               {nextWeek.divisions.map((division) => (
                 <div key={division.name}>
@@ -409,7 +410,8 @@ export default function WeeklyRecapEmail({
                   </div>
                 </div>
               ))}
-            </Section> : null}
+            </Section>
+          ) : null}
 
           <Text style={footer}>Tuesday Twi League</Text>
         </Container>
@@ -728,19 +730,23 @@ export default function RecapEmails() {
     <div>
       <Heading mb="4">Recap Emails</Heading>
 
-      {actionData?.success ? <Callout.Root color="green" mb="4">
+      {actionData?.success ? (
+        <Callout.Root color="green" mb="4">
           <Callout.Icon>
             <CheckCircledIcon />
           </Callout.Icon>
           <Callout.Text>Recap email sent successfully!</Callout.Text>
-        </Callout.Root> : null}
+        </Callout.Root>
+      ) : null}
 
-      {actionData?.error ? <Callout.Root color="red" mb="4">
+      {actionData?.error ? (
+        <Callout.Root color="red" mb="4">
           <Callout.Icon>
             <CrossCircledIcon />
           </Callout.Icon>
           <Callout.Text>{actionData.error}</Callout.Text>
-        </Callout.Root> : null}
+        </Callout.Root>
+      ) : null}
 
       <Flex direction="column" gap="3">
         {weekStatuses.map((week) => {
@@ -763,7 +769,8 @@ export default function RecapEmails() {
                       {week.allWinnersSaved ? "Winners saved" : "No winners"}
                     </Badge>
                   </Flex>
-                  {week.sentAt ? <Text size="1" color="gray">
+                  {week.sentAt ? (
+                    <Text size="1" color="gray">
                       <EnvelopeClosedIcon
                         style={{
                           display: "inline",
@@ -777,7 +784,8 @@ export default function RecapEmails() {
                         hour: "numeric",
                         minute: "2-digit",
                       })}
-                    </Text> : null}
+                    </Text>
+                  ) : null}
                 </Flex>
                 <div>
                   {week.sentAt ? (
@@ -819,7 +827,8 @@ export default function RecapEmails() {
                       </Button>
                     </Form>
                   )}
-                  {week.sentAt ? <Form
+                  {week.sentAt ? (
+                    <Form
                       method="post"
                       id={`form-${week.date}`}
                       style={{ display: "none" }}
@@ -830,7 +839,8 @@ export default function RecapEmails() {
                         name="weekNumber"
                         value={week.weekNumber}
                       />
-                    </Form> : null}
+                    </Form>
+                  ) : null}
                 </div>
               </Flex>
             </Card>
