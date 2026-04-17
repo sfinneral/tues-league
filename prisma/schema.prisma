@@ -57,6 +57,7 @@ model League {
   teams          Team[]
   subs           Sub[]
   playoffMatches PlayoffMatch[]
+  recapEmails    RecapEmail[]
 }
 
 model PlayoffMatch {
@@ -141,4 +142,12 @@ model Winner {
   amountWon Int
   week      Week   @relation(fields: [weekId], references: [id], onDelete: Cascade)
   weekId    String
+}
+
+model RecapEmail {
+  id        String   @id @default(cuid())
+  weekDate  String
+  sentAt    DateTime @default(now())
+  leagueId  String
+  league    League   @relation(fields: [leagueId], references: [id])
 }
