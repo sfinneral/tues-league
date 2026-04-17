@@ -5,10 +5,9 @@ import { Link, useLoaderData } from "@remix-run/react";
 import bcrypt from "bcryptjs";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "");
-
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   if (params.email) {
+    const resend = new Resend(process.env.RESEND_API_KEY || "");
     const { protocol, host } = new URL(request.url);
     const hashedEmail = await bcrypt.hash(params.email, 10);
     const encodedHash = encodeURIComponent(hashedEmail);

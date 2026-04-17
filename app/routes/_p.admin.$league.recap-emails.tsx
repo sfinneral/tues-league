@@ -13,10 +13,9 @@ import {
   EnvelopeClosedIcon,
 } from "@radix-ui/react-icons";
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
 import { Resend } from "resend";
 import { render } from "@react-email/components";
-import { ConfirmDialog } from "~/components/ConfirmDialog";
 import { getDivisionTeamsUsersProfileByLeagueSlug } from "~/models/division.server";
 import { getLeagueBySlug } from "~/models/league.server";
 import {
@@ -29,8 +28,6 @@ import { getScores } from "~/components/WeekResults";
 import { formatDate, getTeamNameByMatch } from "~/utils";
 import WeeklyRecapEmail from "~/emails/weekly-recap";
 import type { WeeklyRecapProps } from "~/emails/weekly-recap";
-
-const resend = new Resend(process.env.RESEND_API_KEY || "");
 
 interface WeekStatus {
   date: string;
@@ -168,6 +165,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
       (s, index) => ({
         rank: index + 1,
         teamName: s.teamName,
+        wins: s.wins,
+        losses: s.losses,
+        ties: s.ties,
         points: s.points,
       }),
     );
@@ -235,6 +235,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     );
   }
 
+  const resend = new Resend(process.env.RESEND_API_KEY || "");
   const { error } = await resend.emails.send({
     from: "Afternoon Golfer <news@mail.afternoongolfer.com>",
     to: recipients,
@@ -255,19 +256,30 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function RecapEmails() {
-  const { weekStatuses, leagueSlug } = useLoaderData<typeof loader>();
+  const { weekStatuses } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
+  const submit = useSubmit();
   const isSubmitting = navigation.state === "submitting";
   const submittingDate = isSubmitting
     ? navigation.formData?.get("weekDate")
     : null;
 
+  function handleResend(weekDate: string, weekNumber: number) {
+    if (!confirm("Are you sure you want to resend this recap email to all league members?")) {
+      return;
+    }
+    submit(
+      { weekDate, weekNumber: String(weekNumber) },
+      { method: "post" },
+    );
+  }
+
   return (
     <div>
       <Heading mb="4">Recap Emails</Heading>
 
-      {actionData?.success && (
+      {actionData?.success && !isSubmitting && (
         <Callout.Root color="green" mb="4">
           <Callout.Icon>
             <CheckCircledIcon />
@@ -276,7 +288,7 @@ export default function RecapEmails() {
         </Callout.Root>
       )}
 
-      {actionData?.error && (
+      {actionData?.error && !isSubmitting && (
         <Callout.Root color="red" mb="4">
           <Callout.Icon>
             <CrossCircledIcon />
@@ -331,69 +343,36 @@ export default function RecapEmails() {
                     </Text>
                   )}
                 </Flex>
-                <div>
-                  {week.sentAt ? (
-                    <ConfirmDialog
-                      title="Resend Recap Email"
-                      description={`Are you sure you want to resend the Week ${week.weekNumber} recap email to all league members?`}
-                      confirmLabel="Resend"
-                      color="blue"
-                      trigger={
-                        <Button
-                          variant="soft"
-                          disabled={!week.isReady || isSubmitting}
-                          loading={submittingDate === week.date}
-                        >
-                          Resend
-                        </Button>
-                      }
-                      onConfirm={() => {
-                        const form = document.getElementById(
-                          `form-${week.date}`,
-                        ) as HTMLFormElement;
-                        form?.requestSubmit();
-                      }}
+                {week.sentAt ? (
+                  <Button
+                    variant="soft"
+                    disabled={!week.isReady || isSubmitting}
+                    loading={submittingDate === week.date}
+                    onClick={() => handleResend(week.date, week.weekNumber)}
+                  >
+                    Resend
+                  </Button>
+                ) : (
+                  <Form method="post">
+                    <input
+                      type="hidden"
+                      name="weekDate"
+                      value={week.date}
                     />
-                  ) : (
-                    <Form method="post" id={`form-${week.date}`}>
-                      <input
-                        type="hidden"
-                        name="weekDate"
-                        value={week.date}
-                      />
-                      <input
-                        type="hidden"
-                        name="weekNumber"
-                        value={week.weekNumber}
-                      />
-                      <Button
-                        type="submit"
-                        disabled={!week.isReady || isSubmitting}
-                        loading={submittingDate === week.date}
-                      >
-                        Send Recap Email
-                      </Button>
-                    </Form>
-                  )}
-                  {week.sentAt && (
-                    <Form
-                      method="post"
-                      id={`form-${week.date}`}
-                      style={{ display: "none" }}
+                    <input
+                      type="hidden"
+                      name="weekNumber"
+                      value={week.weekNumber}
+                    />
+                    <Button
+                      type="submit"
+                      disabled={!week.isReady || isSubmitting}
+                      loading={submittingDate === week.date}
                     >
-                      <input
-                        type="hidden"
-                        name="weekDate"
-                        value={week.date}
-                      />
-                      <input
-                        type="hidden"
-                        name="weekNumber"
-                        value={week.weekNumber}
-                      />
-                    </Form>
-                  )}
-                </div>
+                      Send Recap Email
+                    </Button>
+                  </Form>
+                )}
               </Flex>
             </Card>
           );

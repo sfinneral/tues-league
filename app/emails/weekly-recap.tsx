@@ -27,6 +27,9 @@ interface MoneyWinner {
 interface StandingRow {
   rank: number;
   teamName: string;
+  wins: number;
+  losses: number;
+  ties: number;
   points: number;
 }
 
@@ -129,9 +132,7 @@ const moneyBadge: React.CSSProperties = {
   fontWeight: "600",
 };
 
-const standingsRow: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
+const standingsCell: React.CSSProperties = {
   padding: "4px 0",
   color: "#e2e8f0",
   fontSize: "14px",
@@ -226,11 +227,14 @@ export default function WeeklyRecapEmail({
                 <table width="100%" cellPadding={0} cellSpacing={0}>
                   {division.standings.map((row) => (
                     <tr key={row.teamName}>
-                      <td style={{ ...standingsRow, width: "30px" }}>
+                      <td style={{ ...standingsCell, width: "30px" }}>
                         {row.rank}.
                       </td>
-                      <td style={standingsRow}>{row.teamName}</td>
-                      <td style={standingsRow} align="right">
+                      <td style={standingsCell}>{row.teamName}</td>
+                      <td style={{ ...standingsCell, color: "#94a3b8" }} align="right">
+                        {row.wins}-{row.losses}{row.ties > 0 ? `-${row.ties}` : ""}
+                      </td>
+                      <td style={{ ...standingsCell, width: "50px" }} align="right">
                         {row.points} pts
                       </td>
                     </tr>
