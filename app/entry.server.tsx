@@ -9,6 +9,7 @@ import { PassThrough } from "node:stream";
 import type { EntryContext } from "@remix-run/node";
 import { createReadableStreamFromReadable } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
+// eslint-disable-next-line import/no-named-as-default
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 

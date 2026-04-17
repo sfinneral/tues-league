@@ -13,7 +13,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     const encodedHash = encodeURIComponent(hashedEmail);
     const link = `${protocol}//${host}/reset-password/${encodedHash}`;
     const { error } = await resend.emails.send({
-      from: "Afternoon Golfer <news@mail.afternoongolfer.com>",
+      from: "Tuesday Twi League <news@mail.afternoongolfer.com>",
       to: [params.email],
       subject: "Reset password for Tuesday Twi League",
       html: `<p>Click on this link to reset your password</p><p><a href='${link}'>${link}</a></p>`,

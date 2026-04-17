@@ -29,10 +29,12 @@ model RecapEmail {
 ### Loader
 
 Fetches:
+
 - All schedules with weeks, matches, scores, winners via `getSchedulesByLeagueSlug`
 - All RecapEmail records for the league
 
 Groups weeks by date across divisions. For each date, computes:
+
 - All scores entered? (every `score.score` is non-null)
 - Winners saved? (`week.winners.length > 0`)
 - Recap email sent? (RecapEmail record exists for that date + league)
@@ -40,6 +42,7 @@ Groups weeks by date across divisions. For each date, computes:
 ### UI
 
 A list of week dates, each showing:
+
 - Date heading (e.g., "Tuesday, April 21, 2026")
 - Per-division status badges: "Scores complete" / "Winners saved" / "Missing scores"
 - "Sent on [timestamp]" indicator if already sent
@@ -49,6 +52,7 @@ A list of week dates, each showing:
 ### Action
 
 On form submit:
+
 1. Gathers week data for the target date across all divisions
 2. Computes standings through that week via `getStandingsBySlug`
 3. Finds next week's schedule (next date in the schedule)
@@ -56,7 +60,7 @@ On form submit:
    - **Production:** All team member emails (excluding subs) via `getDivisionTeamsUsersProfileByLeagueSlug`
    - **Development:** Only `sfinneral@gmail.com`
 5. Renders the React Email template to HTML
-6. Sends via Resend (`from: "Afternoon Golfer <news@mail.afternoongolfer.com>"`)
+6. Sends via Resend (`from: "Tuesday Twi League <news@mail.afternoongolfer.com>"`)
 7. On success: creates a `RecapEmail` record
 8. On failure: returns error to the UI without creating a record
 
@@ -75,7 +79,7 @@ Uses `@react-email/components` with dark theme styling to match the app.
    - **Money Winners** — Sorted leaderboard: place, team name, score, payout amount
 3. **Standings** — Per division: rank, team name, points (compact)
 4. **Next Week's Schedule** — Date heading, then per-division matchups ("Team A vs Team B"). Omitted if last week of season.
-5. **Footer** — "Afternoon Golfer" branding
+5. **Footer** — "Tuesday Twi League" branding
 
 ### Props Interface
 
@@ -83,32 +87,32 @@ Uses `@react-email/components` with dark theme styling to match the app.
 interface WeeklyRecapProps {
   weekNumber: number;
   weekDate: string;
-  divisions: Array<{
+  divisions: {
     name: string;
-    matches: Array<{
+    matches: {
       team1: string;
       score1: number;
       team2: string;
       score2: number;
-    }>;
-    moneyWinners: Array<{
+    }[];
+    moneyWinners: {
       place: string;
       teamName: string;
       score: number;
       amount: number;
-    }>;
-    standings: Array<{
+    }[];
+    standings: {
       rank: number;
       teamName: string;
       points: number;
-    }>;
-  }>;
+    }[];
+  }[];
   nextWeek: {
     date: string;
-    divisions: Array<{
+    divisions: {
       name: string;
-      matchups: Array<{ team1: string; team2: string }>;
-    }>;
+      matchups: { team1: string; team2: string }[];
+    }[];
   } | null;
 }
 ```
@@ -118,7 +122,7 @@ Data transformation from Prisma models to props happens in the route action, not
 ## Email Delivery
 
 - **Subject line:** "Week N Recap — [formatted date]"
-- **From:** `Afternoon Golfer <news@mail.afternoongolfer.com>`
+- **From:** `Tuesday Twi League <news@mail.afternoongolfer.com>`
 - **Provider:** Resend (existing `RESEND_API_KEY` env var)
 - **Dev/Prod switch:** `process.env.NODE_ENV === "production"`
 
@@ -142,16 +146,16 @@ Data transformation from Prisma models to props happens in the route action, not
 
 ## Files to Create
 
-| File | Purpose |
-|---|---|
-| `app/emails/weekly-recap.tsx` | React Email template component |
+| File                                           | Purpose                            |
+| ---------------------------------------------- | ---------------------------------- |
+| `app/emails/weekly-recap.tsx`                  | React Email template component     |
 | `app/routes/_p.admin.$league.recap-emails.tsx` | Admin route (loader + action + UI) |
-| `app/models/recap-email.server.ts` | Prisma queries for RecapEmail |
-| `prisma/migrations/...` | Migration for RecapEmail model |
+| `app/models/recap-email.server.ts`             | Prisma queries for RecapEmail      |
+| `prisma/migrations/...`                        | Migration for RecapEmail model     |
 
 ## Files to Modify
 
-| File | Change |
-|---|---|
+| File                   | Change                                    |
+| ---------------------- | ----------------------------------------- |
 | `prisma/schema.prisma` | Add RecapEmail model + relation to League |
-| `app/routes/_p.tsx` | Add "Recap Emails" admin nav link |
+| `app/routes/_p.tsx`    | Add "Recap Emails" admin nav link         |

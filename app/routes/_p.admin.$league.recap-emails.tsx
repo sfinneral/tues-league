@@ -1,4 +1,9 @@
 import {
+  CheckCircledIcon,
+  CrossCircledIcon,
+  EnvelopeClosedIcon,
+} from "@radix-ui/react-icons";
+import {
   Badge,
   Button,
   Card,
@@ -7,27 +12,29 @@ import {
   Heading,
   Text,
 } from "@radix-ui/themes";
-import {
-  CheckCircledIcon,
-  CrossCircledIcon,
-  EnvelopeClosedIcon,
-} from "@radix-ui/react-icons";
-import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { Form, useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
-import { Resend } from "resend";
 import { render } from "@react-email/components";
+import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+  useSubmit,
+} from "@remix-run/react";
+import { Resend } from "resend";
+import { getScores } from "~/components/WeekResults";
+import WeeklyRecapEmail from "~/emails/weekly-recap";
+import type { WeeklyRecapProps } from "~/emails/weekly-recap";
 import { getDivisionTeamsUsersProfileByLeagueSlug } from "~/models/division.server";
 import { getLeagueBySlug } from "~/models/league.server";
+import type { MatchWithScoresAndTeams } from "~/models/match.server";
 import {
   createRecapEmail,
   getRecapEmailsByLeagueId,
 } from "~/models/recap-email.server";
 import { getSchedulesByLeagueSlug } from "~/models/schedule.server";
 import { getStandingsBySlug } from "~/models/standings.server";
-import { getScores } from "~/components/WeekResults";
 import { formatDate, getTeamNameByMatch } from "~/utils";
-import WeeklyRecapEmail from "~/emails/weekly-recap";
-import type { WeeklyRecapProps } from "~/emails/weekly-recap";
 
 interface WeekStatus {
   date: string;
@@ -93,7 +100,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
       weekNumber: index + 1,
       allScoresEntered: status.allScoresEntered,
       allWinnersSaved: status.allWinnersSaved,
-      isReady: status.allScoresEntered && status.allWinnersSaved && !status.wasCancelled,
+      isReady:
+        status.allScoresEntered &&
+        status.allWinnersSaved &&
+        !status.wasCancelled,
       wasCancelled: status.wasCancelled,
       sentAt: recap ? recap.sentAt.toISOString() : null,
     };
@@ -137,18 +147,19 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const week = schedule.weeks.find((w) => w.date === weekDate);
     if (!week || week.wasCancelled) continue;
 
-    const matchData = week.matches.map((match) => {
+    const matches = week.matches as unknown as MatchWithScoresAndTeams[];
+    const matchData = matches.map((match) => {
       const team1Id = match.scores[0].teamId;
       const team2Id = match.scores[1].teamId;
       return {
-        team1: getTeamNameByMatch(match as any, team1Id),
+        team1: getTeamNameByMatch(match, team1Id),
         score1: match.scores[0].score!,
-        team2: getTeamNameByMatch(match as any, team2Id),
+        team2: getTeamNameByMatch(match, team2Id),
         score2: match.scores[1].score!,
       };
     });
 
-    const scores = getScores(week.matches as any);
+    const scores = getScores(matches);
     const moneyWinners = scores
       .filter((s) => s.place)
       .map((s) => ({
@@ -182,16 +193,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   let nextWeek: WeeklyRecapProps["nextWeek"] = null;
   if (nextWeekDate) {
-    const nextDivisions: Array<{
+    const nextDivisions: {
       name: string;
-      matchups: Array<{ team1: string; team2: string }>;
-    }> = [];
+      matchups: { team1: string; team2: string }[];
+    }[] = [];
     for (const schedule of schedules) {
       const week = schedule.weeks.find((w) => w.date === nextWeekDate);
       if (!week || week.wasCancelled) continue;
-      const matchups = week.matches.map((match) => ({
-        team1: getTeamNameByMatch(match as any, match.scores[0].teamId),
-        team2: getTeamNameByMatch(match as any, match.scores[1].teamId),
+      const nextMatches = week.matches as unknown as MatchWithScoresAndTeams[];
+      const matchups = nextMatches.map((match) => ({
+        team1: getTeamNameByMatch(match, match.scores[0].teamId),
+        team2: getTeamNameByMatch(match, match.scores[1].teamId),
       }));
       nextDivisions.push({ name: schedule.division.name, matchups });
     }
@@ -237,7 +249,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const resend = new Resend(process.env.RESEND_API_KEY || "");
   const { error } = await resend.emails.send({
-    from: "Afternoon Golfer <news@mail.afternoongolfer.com>",
+    from: "Tuesday Twi League <news@mail.afternoongolfer.com>",
     to: recipients,
     subject: `Week ${weekNumber} Recap — ${formatDate(weekDate)}`,
     html,
@@ -266,36 +278,33 @@ export default function RecapEmails() {
     : null;
 
   function handleResend(weekDate: string, weekNumber: number) {
-    if (!confirm("Are you sure you want to resend this recap email to all league members?")) {
+    if (
+      !confirm(
+        "Are you sure you want to resend this recap email to all league members?",
+      )
+    ) {
       return;
     }
-    submit(
-      { weekDate, weekNumber: String(weekNumber) },
-      { method: "post" },
-    );
+    submit({ weekDate, weekNumber: String(weekNumber) }, { method: "post" });
   }
 
   return (
     <div>
       <Heading mb="4">Recap Emails</Heading>
 
-      {actionData?.success && !isSubmitting && (
-        <Callout.Root color="green" mb="4">
+      {actionData?.success && !isSubmitting ? <Callout.Root color="green" mb="4">
           <Callout.Icon>
             <CheckCircledIcon />
           </Callout.Icon>
           <Callout.Text>Recap email sent successfully!</Callout.Text>
-        </Callout.Root>
-      )}
+        </Callout.Root> : null}
 
-      {actionData?.error && !isSubmitting && (
-        <Callout.Root color="red" mb="4">
+      {actionData?.error && !isSubmitting ? <Callout.Root color="red" mb="4">
           <Callout.Icon>
             <CrossCircledIcon />
           </Callout.Icon>
           <Callout.Text>{actionData.error}</Callout.Text>
-        </Callout.Root>
-      )}
+        </Callout.Root> : null}
 
       <Flex direction="column" gap="3">
         {weekStatuses.map((week) => {
@@ -309,23 +318,16 @@ export default function RecapEmails() {
                     Week {week.weekNumber} — {formatDate(week.date)}
                   </Text>
                   <Flex gap="2">
-                    <Badge
-                      color={week.allScoresEntered ? "green" : "gray"}
-                    >
+                    <Badge color={week.allScoresEntered ? "green" : "gray"}>
                       {week.allScoresEntered
                         ? "Scores complete"
                         : "Missing scores"}
                     </Badge>
-                    <Badge
-                      color={week.allWinnersSaved ? "green" : "gray"}
-                    >
-                      {week.allWinnersSaved
-                        ? "Winners saved"
-                        : "No winners"}
+                    <Badge color={week.allWinnersSaved ? "green" : "gray"}>
+                      {week.allWinnersSaved ? "Winners saved" : "No winners"}
                     </Badge>
                   </Flex>
-                  {week.sentAt && (
-                    <Text size="1" color="gray">
+                  {week.sentAt ? <Text size="1" color="gray">
                       <EnvelopeClosedIcon
                         style={{
                           display: "inline",
@@ -340,8 +342,7 @@ export default function RecapEmails() {
                         hour: "numeric",
                         minute: "2-digit",
                       })}
-                    </Text>
-                  )}
+                    </Text> : null}
                 </Flex>
                 {week.sentAt ? (
                   <Button
@@ -354,11 +355,7 @@ export default function RecapEmails() {
                   </Button>
                 ) : (
                   <Form method="post">
-                    <input
-                      type="hidden"
-                      name="weekDate"
-                      value={week.date}
-                    />
+                    <input type="hidden" name="weekDate" value={week.date} />
                     <input
                       type="hidden"
                       name="weekNumber"

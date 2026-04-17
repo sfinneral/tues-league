@@ -157,6 +157,9 @@ export default function Profile() {
                 <Link to={`/admin/${leagueSlug}/playoffs`}>
                   <Button>Playoffs</Button>
                 </Link>
+                <Link to={`/admin/${leagueSlug}/recap-emails`}>
+                  <Button>Recap emails</Button>
+                </Link>
               </>
             ) : null}
           </Flex>

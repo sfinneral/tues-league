@@ -12,26 +12,28 @@
 
 ## File Map
 
-| File | Action | Responsibility |
-|---|---|---|
-| `prisma/schema.prisma` | Modify | Add `RecapEmail` model, add relation to `League` |
-| `app/models/recap-email.server.ts` | Create | Prisma queries: create and fetch RecapEmail records |
-| `app/emails/weekly-recap.tsx` | Create | React Email template component (purely presentational) |
-| `app/routes/_p.admin.$league.recap-emails.tsx` | Create | Admin route: loader, action, UI for triggering sends |
-| `app/routes/_p.profile.tsx` | Modify | Add "Recap Emails" admin link |
-| `package.json` | Modify | Add `@react-email/components` dependency |
+| File                                           | Action | Responsibility                                         |
+| ---------------------------------------------- | ------ | ------------------------------------------------------ |
+| `prisma/schema.prisma`                         | Modify | Add `RecapEmail` model, add relation to `League`       |
+| `app/models/recap-email.server.ts`             | Create | Prisma queries: create and fetch RecapEmail records    |
+| `app/emails/weekly-recap.tsx`                  | Create | React Email template component (purely presentational) |
+| `app/routes/_p.admin.$league.recap-emails.tsx` | Create | Admin route: loader, action, UI for triggering sends   |
+| `app/routes/_p.profile.tsx`                    | Modify | Add "Recap Emails" admin link                          |
+| `package.json`                                 | Modify | Add `@react-email/components` dependency               |
 
 ---
 
 ### Task 1: Install dependency and update Prisma schema
 
 **Files:**
+
 - Modify: `package.json` (add dependency)
 - Modify: `prisma/schema.prisma:48-60` (League model) and append new model
 
 - [ ] **Step 1: Install `@react-email/components`**
 
 Run:
+
 ```bash
 yarn add @react-email/components
 ```
@@ -59,6 +61,7 @@ model RecapEmail {
 - [ ] **Step 3: Generate and run the migration**
 
 Run:
+
 ```bash
 npx prisma migrate dev --name add-recap-email
 ```
@@ -68,6 +71,7 @@ Expected: Migration created, `prisma generate` runs automatically, no errors.
 - [ ] **Step 4: Verify the schema compiles**
 
 Run:
+
 ```bash
 npx prisma validate
 ```
@@ -86,6 +90,7 @@ git commit -m "add RecapEmail model and @react-email/components dependency"
 ### Task 2: Create RecapEmail model queries
 
 **Files:**
+
 - Create: `app/models/recap-email.server.ts`
 
 - [ ] **Step 1: Create the model file**
@@ -116,6 +121,7 @@ export function getRecapEmailsByLeagueId(leagueId: League["id"]) {
 - [ ] **Step 2: Verify typecheck passes**
 
 Run:
+
 ```bash
 npx tsc --noEmit
 ```
@@ -134,6 +140,7 @@ git commit -m "add RecapEmail server queries"
 ### Task 3: Create the React Email template
 
 **Files:**
+
 - Create: `app/emails/weekly-recap.tsx`
 
 - [ ] **Step 1: Create the email template**
@@ -182,10 +189,10 @@ interface DivisionData {
 
 interface NextWeekData {
   date: string;
-  divisions: Array<{
+  divisions: {
     name: string;
-    matchups: Array<{ team1: string; team2: string }>;
-  }>;
+    matchups: { team1: string; team2: string }[];
+  }[];
 }
 
 export interface WeeklyRecapProps {
@@ -197,7 +204,8 @@ export interface WeeklyRecapProps {
 
 const main: React.CSSProperties = {
   backgroundColor: "#111113",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily:
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
 };
 
 const container: React.CSSProperties = {
@@ -323,12 +331,12 @@ export default function WeeklyRecapEmail({
                   const team2Wins = match.score2 < match.score1;
                   return (
                     <div key={i}>
-                      {i > 0 && <Hr style={matchDivider} />}
+                      {i > 0 ? <Hr style={matchDivider} /> : null}
                       <table width="100%" cellPadding={0} cellSpacing={0}>
                         <tr>
                           <td style={team1Wins ? winnerName : teamName}>
                             {match.team1}
-                            {team1Wins && " ✓"}
+                            {team1Wins ? " ✓" : null}
                           </td>
                           <td style={scoreText} align="right">
                             {match.score1}
@@ -337,7 +345,7 @@ export default function WeeklyRecapEmail({
                         <tr>
                           <td style={team2Wins ? winnerName : teamName}>
                             {match.team2}
-                            {team2Wins && " ✓"}
+                            {team2Wins ? " ✓" : null}
                           </td>
                           <td style={scoreText} align="right">
                             {match.score2}
@@ -387,8 +395,7 @@ export default function WeeklyRecapEmail({
             </Section>
           ))}
 
-          {nextWeek && (
-            <Section>
+          {nextWeek ? <Section>
               <Text style={divisionHeading}>Next Week — {nextWeek.date}</Text>
               {nextWeek.divisions.map((division) => (
                 <div key={division.name}>
@@ -402,10 +409,9 @@ export default function WeeklyRecapEmail({
                   </div>
                 </div>
               ))}
-            </Section>
-          )}
+            </Section> : null}
 
-          <Text style={footer}>Afternoon Golfer</Text>
+          <Text style={footer}>Tuesday Twi League</Text>
         </Container>
       </Body>
     </Html>
@@ -416,6 +422,7 @@ export default function WeeklyRecapEmail({
 - [ ] **Step 2: Verify typecheck passes**
 
 Run:
+
 ```bash
 npx tsc --noEmit
 ```
@@ -434,6 +441,7 @@ git commit -m "add React Email template for weekly recap"
 ### Task 4: Create the admin route
 
 **Files:**
+
 - Create: `app/routes/_p.admin.$league.recap-emails.tsx`
 
 This is the largest task. The route has a loader (fetch data, compute week statuses), an action (transform data, render email, send via Resend), and UI (week list with send buttons).
@@ -444,6 +452,11 @@ Create `app/routes/_p.admin.$league.recap-emails.tsx`:
 
 ```tsx
 import {
+  CheckCircledIcon,
+  CrossCircledIcon,
+  EnvelopeClosedIcon,
+} from "@radix-ui/react-icons";
+import {
   Badge,
   Button,
   Card,
@@ -452,16 +465,19 @@ import {
   Heading,
   Text,
 } from "@radix-ui/themes";
-import {
-  CheckCircledIcon,
-  CrossCircledIcon,
-  EnvelopeClosedIcon,
-} from "@radix-ui/react-icons";
-import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
-import { Resend } from "resend";
 import { render } from "@react-email/components";
+import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
+import { Resend } from "resend";
 import { ConfirmDialog } from "~/components/ConfirmDialog";
+import { getScores } from "~/components/WeekResults";
+import WeeklyRecapEmail from "~/emails/weekly-recap";
+import type { WeeklyRecapProps } from "~/emails/weekly-recap";
 import { getDivisionTeamsUsersProfileByLeagueSlug } from "~/models/division.server";
 import { getLeagueBySlug } from "~/models/league.server";
 import {
@@ -470,10 +486,7 @@ import {
 } from "~/models/recap-email.server";
 import { getSchedulesByLeagueSlug } from "~/models/schedule.server";
 import { getStandingsBySlug } from "~/models/standings.server";
-import { getScores } from "~/components/WeekResults";
 import { formatDate, getTeamNameByMatch } from "~/utils";
-import WeeklyRecapEmail from "~/emails/weekly-recap";
-import type { WeeklyRecapProps } from "~/emails/weekly-recap";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "");
 
@@ -541,7 +554,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
       weekNumber: index + 1,
       allScoresEntered: status.allScoresEntered,
       allWinnersSaved: status.allWinnersSaved,
-      isReady: status.allScoresEntered && status.allWinnersSaved && !status.wasCancelled,
+      isReady:
+        status.allScoresEntered &&
+        status.allWinnersSaved &&
+        !status.wasCancelled,
       wasCancelled: status.wasCancelled,
       sentAt: recap ? recap.sentAt.toISOString() : null,
     };
@@ -627,10 +643,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   let nextWeek: WeeklyRecapProps["nextWeek"] = null;
   if (nextWeekDate) {
-    const nextDivisions: Array<{
+    const nextDivisions: {
       name: string;
-      matchups: Array<{ team1: string; team2: string }>;
-    }> = [];
+      matchups: { team1: string; team2: string }[];
+    }[] = [];
     for (const schedule of schedules) {
       const week = schedule.weeks.find((w) => w.date === nextWeekDate);
       if (!week || week.wasCancelled) continue;
@@ -681,7 +697,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 
   const { error } = await resend.emails.send({
-    from: "Afternoon Golfer <news@mail.afternoongolfer.com>",
+    from: "Tuesday Twi League <news@mail.afternoongolfer.com>",
     to: recipients,
     subject: `Week ${weekNumber} Recap — ${formatDate(weekDate)}`,
     html,
@@ -712,23 +728,19 @@ export default function RecapEmails() {
     <div>
       <Heading mb="4">Recap Emails</Heading>
 
-      {actionData?.success && (
-        <Callout.Root color="green" mb="4">
+      {actionData?.success ? <Callout.Root color="green" mb="4">
           <Callout.Icon>
             <CheckCircledIcon />
           </Callout.Icon>
           <Callout.Text>Recap email sent successfully!</Callout.Text>
-        </Callout.Root>
-      )}
+        </Callout.Root> : null}
 
-      {actionData?.error && (
-        <Callout.Root color="red" mb="4">
+      {actionData?.error ? <Callout.Root color="red" mb="4">
           <Callout.Icon>
             <CrossCircledIcon />
           </Callout.Icon>
           <Callout.Text>{actionData.error}</Callout.Text>
-        </Callout.Root>
-      )}
+        </Callout.Root> : null}
 
       <Flex direction="column" gap="3">
         {weekStatuses.map((week) => {
@@ -742,23 +754,16 @@ export default function RecapEmails() {
                     Week {week.weekNumber} — {formatDate(week.date)}
                   </Text>
                   <Flex gap="2">
-                    <Badge
-                      color={week.allScoresEntered ? "green" : "gray"}
-                    >
+                    <Badge color={week.allScoresEntered ? "green" : "gray"}>
                       {week.allScoresEntered
                         ? "Scores complete"
                         : "Missing scores"}
                     </Badge>
-                    <Badge
-                      color={week.allWinnersSaved ? "green" : "gray"}
-                    >
-                      {week.allWinnersSaved
-                        ? "Winners saved"
-                        : "No winners"}
+                    <Badge color={week.allWinnersSaved ? "green" : "gray"}>
+                      {week.allWinnersSaved ? "Winners saved" : "No winners"}
                     </Badge>
                   </Flex>
-                  {week.sentAt && (
-                    <Text size="1" color="gray">
+                  {week.sentAt ? <Text size="1" color="gray">
                       <EnvelopeClosedIcon
                         style={{
                           display: "inline",
@@ -766,15 +771,13 @@ export default function RecapEmails() {
                           marginRight: "4px",
                         }}
                       />
-                      Sent{" "}
-                      {new Date(week.sentAt).toLocaleDateString("en-US", {
+                      Sent {new Date(week.sentAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                         hour: "numeric",
                         minute: "2-digit",
                       })}
-                    </Text>
-                  )}
+                    </Text> : null}
                 </Flex>
                 <div>
                   {week.sentAt ? (
@@ -801,11 +804,7 @@ export default function RecapEmails() {
                     />
                   ) : (
                     <Form method="post" id={`form-${week.date}`}>
-                      <input
-                        type="hidden"
-                        name="weekDate"
-                        value={week.date}
-                      />
+                      <input type="hidden" name="weekDate" value={week.date} />
                       <input
                         type="hidden"
                         name="weekNumber"
@@ -820,24 +819,18 @@ export default function RecapEmails() {
                       </Button>
                     </Form>
                   )}
-                  {week.sentAt && (
-                    <Form
+                  {week.sentAt ? <Form
                       method="post"
                       id={`form-${week.date}`}
                       style={{ display: "none" }}
                     >
-                      <input
-                        type="hidden"
-                        name="weekDate"
-                        value={week.date}
-                      />
+                      <input type="hidden" name="weekDate" value={week.date} />
                       <input
                         type="hidden"
                         name="weekNumber"
                         value={week.weekNumber}
                       />
-                    </Form>
-                  )}
+                    </Form> : null}
                 </div>
               </Flex>
             </Card>
@@ -852,6 +845,7 @@ export default function RecapEmails() {
 - [ ] **Step 2: Verify typecheck passes**
 
 Run:
+
 ```bash
 npx tsc --noEmit
 ```
@@ -861,6 +855,7 @@ Expected: No errors. The most likely issue will be the `render` import — `@rea
 - [ ] **Step 3: Test in the browser**
 
 Navigate to `http://localhost:3000/admin/{leagueSlug}/recap-emails`. Verify:
+
 - Week list shows with correct dates and status badges
 - Weeks with all scores and winners show the "Send Recap Email" button enabled
 - Weeks without scores show disabled buttons
@@ -869,6 +864,7 @@ Navigate to `http://localhost:3000/admin/{leagueSlug}/recap-emails`. Verify:
 - [ ] **Step 4: Test sending an email in dev**
 
 Click "Send Recap Email" for a completed week. Verify:
+
 - The email is sent to `sfinneral@gmail.com` (check Resend dashboard or inbox)
 - A success callout appears
 - The "Sent" timestamp appears
@@ -886,6 +882,7 @@ git commit -m "add admin route for sending recap emails"
 ### Task 5: Add admin nav link
 
 **Files:**
+
 - Modify: `app/routes/_p.profile.tsx:146-158`
 
 - [ ] **Step 1: Add the Recap Emails link to the admin section**
@@ -893,9 +890,9 @@ git commit -m "add admin route for sending recap emails"
 In `app/routes/_p.profile.tsx`, after the "Enter Scores" link (line 148) add:
 
 ```tsx
-            <Link to={`/admin/${leagueSlug}/recap-emails`}>
-              <Button>Recap Emails</Button>
-            </Link>
+<Link to={`/admin/${leagueSlug}/recap-emails`}>
+  <Button>Recap Emails</Button>
+</Link>
 ```
 
 The full admin links block (lines 146–158) should become:

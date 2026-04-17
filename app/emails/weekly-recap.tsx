@@ -42,10 +42,10 @@ interface DivisionData {
 
 interface NextWeekData {
   date: string;
-  divisions: Array<{
+  divisions: {
     name: string;
-    matchups: Array<{ team1: string; team2: string }>;
-  }>;
+    matchups: { team1: string; team2: string }[];
+  }[];
 }
 
 export interface WeeklyRecapProps {
@@ -57,7 +57,8 @@ export interface WeeklyRecapProps {
 
 const main: React.CSSProperties = {
   backgroundColor: "#111113",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily:
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
 };
 
 const container: React.CSSProperties = {
@@ -179,12 +180,12 @@ export default function WeeklyRecapEmail({
                   const team2Wins = match.score2 < match.score1;
                   return (
                     <div key={i}>
-                      {i > 0 && <Hr style={matchDivider} />}
+                      {i > 0 ? <Hr style={matchDivider} /> : null}
                       <table width="100%" cellPadding={0} cellSpacing={0}>
                         <tr>
                           <td style={team1Wins ? winnerName : teamName}>
                             {match.team1}
-                            {team1Wins && " ✓"}
+                            {team1Wins ? " ✓" : null}
                           </td>
                           <td style={scoreText} align="right">
                             {match.score1}
@@ -193,7 +194,7 @@ export default function WeeklyRecapEmail({
                         <tr>
                           <td style={team2Wins ? winnerName : teamName}>
                             {match.team2}
-                            {team2Wins && " ✓"}
+                            {team2Wins ? " ✓" : null}
                           </td>
                           <td style={scoreText} align="right">
                             {match.score2}
@@ -231,10 +232,17 @@ export default function WeeklyRecapEmail({
                         {row.rank}.
                       </td>
                       <td style={standingsCell}>{row.teamName}</td>
-                      <td style={{ ...standingsCell, color: "#94a3b8" }} align="right">
-                        {row.wins}-{row.losses}{row.ties > 0 ? `-${row.ties}` : ""}
+                      <td
+                        style={{ ...standingsCell, color: "#94a3b8" }}
+                        align="right"
+                      >
+                        {row.wins}-{row.losses}
+                        {row.ties > 0 ? `-${row.ties}` : ""}
                       </td>
-                      <td style={{ ...standingsCell, width: "50px" }} align="right">
+                      <td
+                        style={{ ...standingsCell, width: "50px" }}
+                        align="right"
+                      >
                         {row.points} pts
                       </td>
                     </tr>
@@ -246,8 +254,7 @@ export default function WeeklyRecapEmail({
             </Section>
           ))}
 
-          {nextWeek && (
-            <Section>
+          {nextWeek ? <Section>
               <Text style={divisionHeading}>Next Week — {nextWeek.date}</Text>
               {nextWeek.divisions.map((division) => (
                 <div key={division.name}>
@@ -261,10 +268,9 @@ export default function WeeklyRecapEmail({
                   </div>
                 </div>
               ))}
-            </Section>
-          )}
+            </Section> : null}
 
-          <Text style={footer}>Afternoon Golfer</Text>
+          <Text style={footer}>Tuesday Twi League</Text>
         </Container>
       </Body>
     </Html>
