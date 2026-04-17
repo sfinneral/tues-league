@@ -146,6 +146,9 @@ export default function Profile() {
             <Link to={`/admin/${leagueSlug}/matches`}>
               <Button>Enter Scores</Button>
             </Link>
+            <Link to={`/admin/${leagueSlug}/recap-emails`}>
+              <Button>Recap Emails</Button>
+            </Link>
             {isSteve ? (
               <>
                 <Link to={`/admin/users`}>
