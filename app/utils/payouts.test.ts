@@ -1,14 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { calculatePayouts } from "./payouts";
 import type { PayoutConfig } from "~/models/division.server";
-
-interface MockScore {
-  score: number | null;
-  teamId: string;
-}
+import type { MatchWithScoresAndTeams } from "~/models/match.server";
+import { calculatePayouts } from "./payouts";
 
 function buildMatches(teamScores: { teamId: string; score: number | null }[]) {
-  const pairs: { scores: MockScore[]; teams: { id: string; users: { profile: { lastName: string } }[] }[] }[] = [];
+  const pairs = [];
   for (let i = 0; i < teamScores.length; i += 2) {
     const t1 = teamScores[i];
     const t2 = teamScores[i + 1];
@@ -23,7 +19,7 @@ function buildMatches(teamScores: { teamId: string; score: number | null }[]) {
       ],
     });
   }
-  return pairs as any;
+  return pairs as unknown as MatchWithScoresAndTeams[];
 }
 
 const config3place: PayoutConfig = {

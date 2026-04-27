@@ -54,10 +54,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const thirdPlace = thirdPlaceRaw ? Number(thirdPlaceRaw) : null;
 
     invariant(Boolean(divisionId), "division id is required");
-    invariant(!isNaN(firstPlace) && firstPlace > 0, "1st place amount is required");
-    invariant(!isNaN(secondPlace) && secondPlace > 0, "2nd place amount is required");
+    invariant(
+      !isNaN(firstPlace) && firstPlace > 0,
+      "1st place amount is required",
+    );
+    invariant(
+      !isNaN(secondPlace) && secondPlace > 0,
+      "2nd place amount is required",
+    );
 
-    return upsertDivisionPayout(divisionId, firstPlace, secondPlace, thirdPlace);
+    return upsertDivisionPayout(
+      divisionId,
+      firstPlace,
+      secondPlace,
+      thirdPlace,
+    );
   }
 }
 
@@ -72,8 +83,16 @@ export async function loader({ params }: LoaderFunctionArgs) {
       return {
         ...division,
         payout: payout
-          ? { firstPlace: payout.firstPlace, secondPlace: payout.secondPlace, thirdPlace: payout.thirdPlace }
-          : { firstPlace: DEFAULT_PAYOUT.firstPlace, secondPlace: DEFAULT_PAYOUT.secondPlace, thirdPlace: DEFAULT_PAYOUT.thirdPlace },
+          ? {
+              firstPlace: payout.firstPlace,
+              secondPlace: payout.secondPlace,
+              thirdPlace: payout.thirdPlace,
+            }
+          : {
+              firstPlace: DEFAULT_PAYOUT.firstPlace,
+              secondPlace: DEFAULT_PAYOUT.secondPlace,
+              thirdPlace: DEFAULT_PAYOUT.thirdPlace,
+            },
       };
     }),
   );
@@ -119,9 +138,12 @@ export default function AdminDivisions() {
               <input type="hidden" name="_action" value="savePayout" />
               <input type="hidden" name="divisionId" value={division.id} />
               <Flex gap="3" align="end" wrap="wrap">
-                <label>
-                  <Text size="1" weight="bold" mb="1" as="p">1st Place ($)</Text>
+                <label htmlFor={`firstPlace-${division.id}`}>
+                  <Text size="1" weight="bold" mb="1" as="p">
+                    1st Place ($)
+                  </Text>
                   <TextField.Root
+                    id={`firstPlace-${division.id}`}
                     name="firstPlace"
                     type="number"
                     defaultValue={division.payout.firstPlace}
@@ -129,9 +151,12 @@ export default function AdminDivisions() {
                     style={{ width: 80 }}
                   />
                 </label>
-                <label>
-                  <Text size="1" weight="bold" mb="1" as="p">2nd Place ($)</Text>
+                <label htmlFor={`secondPlace-${division.id}`}>
+                  <Text size="1" weight="bold" mb="1" as="p">
+                    2nd Place ($)
+                  </Text>
                   <TextField.Root
+                    id={`secondPlace-${division.id}`}
                     name="secondPlace"
                     type="number"
                     defaultValue={division.payout.secondPlace}
@@ -139,9 +164,12 @@ export default function AdminDivisions() {
                     style={{ width: 80 }}
                   />
                 </label>
-                <label>
-                  <Text size="1" weight="bold" mb="1" as="p">3rd Place ($)</Text>
+                <label htmlFor={`thirdPlace-${division.id}`}>
+                  <Text size="1" weight="bold" mb="1" as="p">
+                    3rd Place ($)
+                  </Text>
                   <TextField.Root
+                    id={`thirdPlace-${division.id}`}
                     name="thirdPlace"
                     type="number"
                     defaultValue={division.payout.thirdPlace ?? ""}
