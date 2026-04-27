@@ -2,6 +2,10 @@ import { Card, Flex, Heading, Table, Text } from "@radix-ui/themes";
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
 import LeagueStandingRow from "~/components/LeagueStandingRow";
+import {
+  DEFAULT_PAYOUT,
+  getPayoutByDivisionId,
+} from "~/models/division.server";
 import { getStandingsBySlug, Standing } from "~/models/standings.server";
 import { formatCurrency } from "~/utils";
 
@@ -9,14 +13,34 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const leagueSlug = params.league as string;
   const leagueStandings = await getStandingsBySlug(leagueSlug);
 
+  const payoutConfigs: Record<
+    string,
+    { firstPlace: number; secondPlace: number; thirdPlace: number | null }
+  > = {};
+  for (const ls of leagueStandings) {
+    const payout = await getPayoutByDivisionId(ls.division.id);
+    payoutConfigs[ls.division.id] = payout
+      ? {
+          firstPlace: payout.firstPlace,
+          secondPlace: payout.secondPlace,
+          thirdPlace: payout.thirdPlace,
+        }
+      : DEFAULT_PAYOUT;
+  }
+
   return json({
     leagueStandings,
+    payoutConfigs,
   });
 }
 
 export default function LeagueStandings() {
-  const { leagueStandings } = useLoaderData<typeof loader>();
+  const { leagueStandings, payoutConfigs } = useLoaderData<typeof loader>();
   const { isSteve } = useRouteLoaderData("routes/_p") as { isSteve: boolean };
+  const getWeeklyTotal = (divisionId: string) => {
+    const config = payoutConfigs[divisionId] || DEFAULT_PAYOUT;
+    return config.firstPlace + config.secondPlace + (config.thirdPlace || 0);
+  };
   const getTotalAmountWon = (standings: Standing[]) => {
     return formatCurrency(
       standings.reduce((acc, standing) => {
@@ -72,8 +96,9 @@ export default function LeagueStandings() {
               >
                 <Text size="2">{`${
                   leagueStanding.standings[0].matchRecord.length
-                } weeks x 225 = ${formatCurrency(
-                  leagueStanding.standings[0].matchRecord.length * 225,
+                } weeks x ${formatCurrency(getWeeklyTotal(leagueStanding.division.id))} = ${formatCurrency(
+                  leagueStanding.standings[0].matchRecord.length *
+                    getWeeklyTotal(leagueStanding.division.id),
                 )}`}</Text>
                 <Text size="2">
                   {getTotalAmountWon(leagueStanding.standings)}
