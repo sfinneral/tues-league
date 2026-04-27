@@ -1,8 +1,8 @@
 import { Text } from "@radix-ui/themes";
-import { ReactElement } from "react";
+import { ReactNode } from "react";
 
 interface InlineErrorProps {
-  children: ReactElement | string;
+  children: ReactNode;
 }
 
 export default function InlineError({ children }: InlineErrorProps) {

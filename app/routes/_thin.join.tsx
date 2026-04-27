@@ -217,7 +217,24 @@ export default function Join() {
           ref={emailRef}
         />
         {actionData?.errors?.email ? (
-          <InlineError>{actionData.errors.email}</InlineError>
+          <InlineError>
+            {actionData.errors.email ===
+            "A user already exists with this email" ? (
+              <>
+                This email already has an account.{" "}
+                <Link
+                  to={{
+                    pathname: "/login",
+                    search: searchParams.toString(),
+                  }}
+                >
+                  <StyledLink>Log in instead</StyledLink>
+                </Link>
+              </>
+            ) : (
+              actionData.errors.email
+            )}
+          </InlineError>
         ) : null}
         <TextField.Root
           className="mt-4"
