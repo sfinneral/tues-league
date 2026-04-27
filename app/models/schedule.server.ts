@@ -87,6 +87,7 @@ export async function getSchedulesByLeagueSlug(slug: League["slug"]) {
       division: {
         include: {
           teams: true,
+          payout: true,
         },
       },
       weeks: {

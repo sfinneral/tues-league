@@ -17,6 +17,7 @@ import {
 } from "@remix-run/react";
 import Carousel from "~/components/Carousel";
 import { getScores, WeekResults } from "~/components/WeekResults";
+import type { PayoutConfig } from "~/models/division.server";
 import { getSchedulesByLeagueSlug } from "~/models/schedule.server";
 import { saveWinners } from "~/models/week.server";
 import { formatDate, getTeamNameByMatch, roundNumber } from "~/utils";
@@ -133,8 +134,24 @@ export default function LeagueHome() {
     }
   };
 
-  const saveWinners = (week: WeekWithMatches) => {
-    const winners = getScores(week.matches);
+  const getPayoutConfig = (
+    schedule: (typeof schedules)[number],
+  ): PayoutConfig => {
+    if (schedule.division.payout) {
+      return {
+        firstPlace: schedule.division.payout.firstPlace,
+        secondPlace: schedule.division.payout.secondPlace,
+        thirdPlace: schedule.division.payout.thirdPlace,
+      };
+    }
+    return { firstPlace: 175, secondPlace: 50, thirdPlace: null };
+  };
+
+  const saveWinners = (
+    week: WeekWithMatches,
+    schedule: (typeof schedules)[number],
+  ) => {
+    const winners = getScores(week.matches, getPayoutConfig(schedule));
     const form = new FormData();
     form.append("weekId", week.id);
     form.append("winners", JSON.stringify(winners));
@@ -180,7 +197,10 @@ export default function LeagueHome() {
                         </div>
                       ))}
                     </Card>
-                    <WeekResults matches={week.matches} />
+                    <WeekResults
+                      matches={week.matches}
+                      payoutConfig={getPayoutConfig(schedule)}
+                    />
                     {isSteve ? (
                       <Flex
                         justify="center"
@@ -191,7 +211,7 @@ export default function LeagueHome() {
                       >
                         <Button
                           variant="soft"
-                          onClick={() => saveWinners(week)}
+                          onClick={() => saveWinners(week, schedule)}
                           loading={isSubmitting}
                         >
                           {week.winners.length
