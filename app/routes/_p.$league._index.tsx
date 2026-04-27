@@ -17,7 +17,7 @@ import {
 } from "@remix-run/react";
 import Carousel from "~/components/Carousel";
 import { getScores, WeekResults } from "~/components/WeekResults";
-import { DEFAULT_PAYOUT, PayoutConfig } from "~/models/division.server";
+import type { PayoutConfig } from "~/models/division.server";
 import { getSchedulesByLeagueSlug } from "~/models/schedule.server";
 import { saveWinners } from "~/models/week.server";
 import { formatDate, getTeamNameByMatch, roundNumber } from "~/utils";
@@ -142,7 +142,7 @@ export default function LeagueHome() {
         thirdPlace: schedule.division.payout.thirdPlace,
       };
     }
-    return DEFAULT_PAYOUT;
+    return { firstPlace: 175, secondPlace: 50, thirdPlace: null };
   };
 
   const saveWinners = (week: WeekWithMatches, schedule: (typeof schedules)[number]) => {

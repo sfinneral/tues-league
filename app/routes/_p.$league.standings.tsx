@@ -38,7 +38,7 @@ export default function LeagueStandings() {
   const { leagueStandings, payoutConfigs } = useLoaderData<typeof loader>();
   const { isSteve } = useRouteLoaderData("routes/_p") as { isSteve: boolean };
   const getWeeklyTotal = (divisionId: string) => {
-    const config = payoutConfigs[divisionId] || DEFAULT_PAYOUT;
+    const config = payoutConfigs[divisionId] || { firstPlace: 175, secondPlace: 50, thirdPlace: null };
     return config.firstPlace + config.secondPlace + (config.thirdPlace || 0);
   };
   const getTotalAmountWon = (standings: Standing[]) => {

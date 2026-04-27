@@ -73,7 +73,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
         ...division,
         payout: payout
           ? { firstPlace: payout.firstPlace, secondPlace: payout.secondPlace, thirdPlace: payout.thirdPlace }
-          : null,
+          : { firstPlace: DEFAULT_PAYOUT.firstPlace, secondPlace: DEFAULT_PAYOUT.secondPlace, thirdPlace: DEFAULT_PAYOUT.thirdPlace },
       };
     }),
   );
@@ -124,7 +124,7 @@ export default function AdminDivisions() {
                   <TextField.Root
                     name="firstPlace"
                     type="number"
-                    defaultValue={division.payout?.firstPlace ?? DEFAULT_PAYOUT.firstPlace}
+                    defaultValue={division.payout.firstPlace}
                     min={0}
                     style={{ width: 80 }}
                   />
@@ -134,7 +134,7 @@ export default function AdminDivisions() {
                   <TextField.Root
                     name="secondPlace"
                     type="number"
-                    defaultValue={division.payout?.secondPlace ?? DEFAULT_PAYOUT.secondPlace}
+                    defaultValue={division.payout.secondPlace}
                     min={0}
                     style={{ width: 80 }}
                   />
@@ -144,7 +144,7 @@ export default function AdminDivisions() {
                   <TextField.Root
                     name="thirdPlace"
                     type="number"
-                    defaultValue={division.payout?.thirdPlace ?? ""}
+                    defaultValue={division.payout.thirdPlace ?? ""}
                     min={0}
                     placeholder="—"
                     style={{ width: 80 }}
