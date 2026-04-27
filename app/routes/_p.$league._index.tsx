@@ -134,7 +134,9 @@ export default function LeagueHome() {
     }
   };
 
-  const getPayoutConfig = (schedule: (typeof schedules)[number]): PayoutConfig => {
+  const getPayoutConfig = (
+    schedule: (typeof schedules)[number],
+  ): PayoutConfig => {
     if (schedule.division.payout) {
       return {
         firstPlace: schedule.division.payout.firstPlace,
@@ -145,7 +147,10 @@ export default function LeagueHome() {
     return { firstPlace: 175, secondPlace: 50, thirdPlace: null };
   };
 
-  const saveWinners = (week: WeekWithMatches, schedule: (typeof schedules)[number]) => {
+  const saveWinners = (
+    week: WeekWithMatches,
+    schedule: (typeof schedules)[number],
+  ) => {
     const winners = getScores(week.matches, getPayoutConfig(schedule));
     const form = new FormData();
     form.append("weekId", week.id);
@@ -192,7 +197,10 @@ export default function LeagueHome() {
                         </div>
                       ))}
                     </Card>
-                    <WeekResults matches={week.matches} payoutConfig={getPayoutConfig(schedule)} />
+                    <WeekResults
+                      matches={week.matches}
+                      payoutConfig={getPayoutConfig(schedule)}
+                    />
                     {isSteve ? (
                       <Flex
                         justify="center"

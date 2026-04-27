@@ -38,7 +38,11 @@ export default function LeagueStandings() {
   const { leagueStandings, payoutConfigs } = useLoaderData<typeof loader>();
   const { isSteve } = useRouteLoaderData("routes/_p") as { isSteve: boolean };
   const getWeeklyTotal = (divisionId: string) => {
-    const config = payoutConfigs[divisionId] || { firstPlace: 175, secondPlace: 50, thirdPlace: null };
+    const config = payoutConfigs[divisionId] || {
+      firstPlace: 175,
+      secondPlace: 50,
+      thirdPlace: null,
+    };
     return config.firstPlace + config.secondPlace + (config.thirdPlace || 0);
   };
   const getTotalAmountWon = (standings: Standing[]) => {
@@ -96,7 +100,9 @@ export default function LeagueStandings() {
               >
                 <Text size="2">{`${
                   leagueStanding.standings[0].matchRecord.length
-                } weeks x ${formatCurrency(getWeeklyTotal(leagueStanding.division.id))} = ${formatCurrency(
+                } weeks x ${formatCurrency(
+                  getWeeklyTotal(leagueStanding.division.id),
+                )} = ${formatCurrency(
                   leagueStanding.standings[0].matchRecord.length *
                     getWeeklyTotal(leagueStanding.division.id),
                 )}`}</Text>

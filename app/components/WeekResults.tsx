@@ -1,6 +1,6 @@
 import { Badge, Card, Flex, Heading } from "@radix-ui/themes";
-import { MatchWithScoresAndTeams } from "~/models/match.server";
 import { DEFAULT_PAYOUT, PayoutConfig } from "~/models/division.server";
+import { MatchWithScoresAndTeams } from "~/models/match.server";
 import { calculatePayouts, ScoredResult } from "~/utils/payouts";
 
 interface WeekResultsProps {

@@ -1,6 +1,6 @@
 import { BadgeProps } from "@radix-ui/themes";
-import { MatchWithScoresAndTeams } from "~/models/match.server";
 import type { PayoutConfig } from "~/models/division.server";
+import { MatchWithScoresAndTeams } from "~/models/match.server";
 import { formatCurrency, getTeamNameByMatch, roundNumber } from "~/utils";
 
 export interface ScoredResult {
@@ -57,7 +57,11 @@ export function calculatePayouts(
     const placesConsumed = poolEnd - poolStart;
 
     let pool = 0;
-    for (let p = position; p < Math.min(position + placesConsumed, totalPaidPlaces); p++) {
+    for (
+      let p = position;
+      p < Math.min(position + placesConsumed, totalPaidPlaces);
+      p++
+    ) {
       pool += places[p];
     }
 
@@ -70,7 +74,9 @@ export function calculatePayouts(
       placeNumber === 1 ? "green" : placeNumber === 2 ? "blue" : "bronze";
 
     for (let i = position; i < poolEnd; i++) {
-      scores[i].place = `${tiePrefix}${placeLabel} ${formatCurrency(splitAmount)}`;
+      scores[i].place = `${tiePrefix}${placeLabel} ${formatCurrency(
+        splitAmount,
+      )}`;
       scores[i].amountWon = splitAmount;
       scores[i].color = color;
     }

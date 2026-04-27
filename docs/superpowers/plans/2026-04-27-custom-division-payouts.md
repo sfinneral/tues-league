@@ -12,24 +12,25 @@
 
 ## File Structure
 
-| File | Action | Responsibility |
-|---|---|---|
-| `prisma/schema.prisma` | Modify | Add `DivisionPayout` model |
-| `app/models/division.server.ts` | Modify | Add CRUD for division payouts |
-| `app/utils/payouts.ts` | Create | Pure payout calculation logic (extracted from WeekResults) |
-| `app/utils/payouts.test.ts` | Create | Tests for all payout + tie scenarios |
-| `app/components/WeekResults.tsx` | Modify | Use new payout utility instead of hardcoded logic |
-| `app/routes/_p.$league._index.tsx` | Modify | Load payout config, pass to `getScores` and `WeekResults` |
-| `app/routes/_p.admin.$league.divisions.tsx` | Modify | Add payout config UI per division |
-| `app/routes/_p.$league.standings.tsx` | Modify | Load payout config, replace hardcoded `225` |
-| `app/routes/_p.admin.$league.recap-emails.tsx` | Modify | Load payout config, pass to `getScores` |
-| `app/models/schedule.server.ts` | Modify | Include `DivisionPayout` in schedule queries |
+| File                                           | Action | Responsibility                                             |
+| ---------------------------------------------- | ------ | ---------------------------------------------------------- |
+| `prisma/schema.prisma`                         | Modify | Add `DivisionPayout` model                                 |
+| `app/models/division.server.ts`                | Modify | Add CRUD for division payouts                              |
+| `app/utils/payouts.ts`                         | Create | Pure payout calculation logic (extracted from WeekResults) |
+| `app/utils/payouts.test.ts`                    | Create | Tests for all payout + tie scenarios                       |
+| `app/components/WeekResults.tsx`               | Modify | Use new payout utility instead of hardcoded logic          |
+| `app/routes/_p.$league._index.tsx`             | Modify | Load payout config, pass to `getScores` and `WeekResults`  |
+| `app/routes/_p.admin.$league.divisions.tsx`    | Modify | Add payout config UI per division                          |
+| `app/routes/_p.$league.standings.tsx`          | Modify | Load payout config, replace hardcoded `225`                |
+| `app/routes/_p.admin.$league.recap-emails.tsx` | Modify | Load payout config, pass to `getScores`                    |
+| `app/models/schedule.server.ts`                | Modify | Include `DivisionPayout` in schedule queries               |
 
 ---
 
 ### Task 1: Add DivisionPayout model to Prisma schema
 
 **Files:**
+
 - Modify: `prisma/schema.prisma`
 
 - [ ] **Step 1: Add the DivisionPayout model and update Division**
@@ -87,6 +88,7 @@ git commit -m "feat: add DivisionPayout model for per-division payout config"
 ### Task 2: Add division payout CRUD functions
 
 **Files:**
+
 - Modify: `app/models/division.server.ts`
 
 - [ ] **Step 1: Add upsert and get functions for division payouts**
@@ -144,6 +146,7 @@ git commit -m "feat: add division payout CRUD and default config"
 ### Task 3: Create payout calculation utility with tests
 
 **Files:**
+
 - Create: `app/utils/payouts.ts`
 - Create: `app/utils/payouts.test.ts`
 
@@ -164,7 +167,10 @@ interface MockScore {
 }
 
 function buildMatches(teamScores: { teamId: string; score: number | null }[]) {
-  const pairs: { scores: MockScore[]; teams: { id: string; users: { profile: { lastName: string } }[] }[] }[] = [];
+  const pairs: {
+    scores: MockScore[];
+    teams: { id: string; users: { profile: { lastName: string } }[] }[];
+  }[] = [];
   for (let i = 0; i < teamScores.length; i += 2) {
     const t1 = teamScores[i];
     const t2 = teamScores[i + 1];
@@ -485,7 +491,11 @@ export function calculatePayouts(
     const placesConsumed = poolEnd - poolStart;
 
     let pool = 0;
-    for (let p = position; p < Math.min(position + placesConsumed, totalPaidPlaces); p++) {
+    for (
+      let p = position;
+      p < Math.min(position + placesConsumed, totalPaidPlaces);
+      p++
+    ) {
       pool += places[p];
     }
 
@@ -498,7 +508,9 @@ export function calculatePayouts(
       placeNumber === 1 ? "green" : placeNumber === 2 ? "blue" : "bronze";
 
     for (let i = position; i < poolEnd; i++) {
-      scores[i].place = `${tiePrefix}${placeLabel} ${formatCurrency(splitAmount)}`;
+      scores[i].place = `${tiePrefix}${placeLabel} ${formatCurrency(
+        splitAmount,
+      )}`;
       scores[i].amountWon = splitAmount;
       scores[i].color = color;
     }
@@ -532,6 +544,7 @@ git commit -m "feat: add payout calculation utility with tie-splitting logic"
 ### Task 4: Update WeekResults to use new payout utility
 
 **Files:**
+
 - Modify: `app/components/WeekResults.tsx`
 
 - [ ] **Step 1: Replace getScores with calculatePayouts**
@@ -604,6 +617,7 @@ git commit -m "refactor: delegate WeekResults payout calc to shared utility"
 ### Task 5: Load payout config in league home page and pass to components
 
 **Files:**
+
 - Modify: `app/models/schedule.server.ts`
 - Modify: `app/routes/_p.$league._index.tsx`
 
@@ -647,34 +661,39 @@ import { DEFAULT_PAYOUT, PayoutConfig } from "~/models/division.server";
 Add a helper function inside `LeagueHome` to extract the config from a schedule:
 
 ```typescript
-  const getPayoutConfig = (schedule: (typeof schedules)[number]): PayoutConfig => {
-    if (schedule.division.payout) {
-      return {
-        firstPlace: schedule.division.payout.firstPlace,
-        secondPlace: schedule.division.payout.secondPlace,
-        thirdPlace: schedule.division.payout.thirdPlace,
-      };
-    }
-    return DEFAULT_PAYOUT;
-  };
+const getPayoutConfig = (
+  schedule: (typeof schedules)[number],
+): PayoutConfig => {
+  if (schedule.division.payout) {
+    return {
+      firstPlace: schedule.division.payout.firstPlace,
+      secondPlace: schedule.division.payout.secondPlace,
+      thirdPlace: schedule.division.payout.thirdPlace,
+    };
+  }
+  return DEFAULT_PAYOUT;
+};
 ```
 
 Update the `saveWinners` function call to pass config. Find this line:
 
 ```typescript
-    const winners = getScores(week.matches);
+const winners = getScores(week.matches);
 ```
 
 This needs to accept the schedule to get the config. Change the `saveWinners` function signature and body:
 
 ```typescript
-  const saveWinners = (week: WeekWithMatches, schedule: (typeof schedules)[number]) => {
-    const winners = getScores(week.matches, getPayoutConfig(schedule));
-    const form = new FormData();
-    form.append("weekId", week.id);
-    form.append("winners", JSON.stringify(winners));
-    fetcher.submit(form, { method: "post" });
-  };
+const saveWinners = (
+  week: WeekWithMatches,
+  schedule: (typeof schedules)[number],
+) => {
+  const winners = getScores(week.matches, getPayoutConfig(schedule));
+  const form = new FormData();
+  form.append("weekId", week.id);
+  form.append("winners", JSON.stringify(winners));
+  fetcher.submit(form, { method: "post" });
+};
 ```
 
 Update the button's `onClick` in the JSX from:
@@ -721,6 +740,7 @@ git commit -m "feat: pass division payout config to WeekResults and save-winners
 ### Task 6: Update recap emails to use payout config
 
 **Files:**
+
 - Modify: `app/routes/_p.admin.$league.recap-emails.tsx`
 
 - [ ] **Step 1: Pass payout config to getScores in recap email action**
@@ -736,20 +756,20 @@ import { DEFAULT_PAYOUT } from "~/models/division.server";
 Change this block (around line 162):
 
 ```typescript
-    const scores = getScores(matches);
+const scores = getScores(matches);
 ```
 
 to:
 
 ```typescript
-    const payoutConfig = schedule.division.payout
-      ? {
-          firstPlace: schedule.division.payout.firstPlace,
-          secondPlace: schedule.division.payout.secondPlace,
-          thirdPlace: schedule.division.payout.thirdPlace,
-        }
-      : DEFAULT_PAYOUT;
-    const scores = getScores(matches, payoutConfig);
+const payoutConfig = schedule.division.payout
+  ? {
+      firstPlace: schedule.division.payout.firstPlace,
+      secondPlace: schedule.division.payout.secondPlace,
+      thirdPlace: schedule.division.payout.thirdPlace,
+    }
+  : DEFAULT_PAYOUT;
+const scores = getScores(matches, payoutConfig);
 ```
 
 This works because `getSchedulesByLeagueSlug` now includes the `payout` relation (from Task 5).
@@ -774,6 +794,7 @@ git commit -m "feat: use division payout config in recap emails"
 ### Task 7: Update standings page to use payout config
 
 **Files:**
+
 - Modify: `app/routes/_p.$league.standings.tsx`
 
 The standings page has a hardcoded `225` for the admin audit footer. It should now compute the per-division weekly total from the payout config.
@@ -787,7 +808,10 @@ However, the standings server function returns a `Division` type which won't inc
 Add imports:
 
 ```typescript
-import { getPayoutByDivisionId, DEFAULT_PAYOUT } from "~/models/division.server";
+import {
+  getPayoutByDivisionId,
+  DEFAULT_PAYOUT,
+} from "~/models/division.server";
 ```
 
 Update the loader to also fetch payout configs:
@@ -797,11 +821,18 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const leagueSlug = params.league as string;
   const leagueStandings = await getStandingsBySlug(leagueSlug);
 
-  const payoutConfigs: Record<string, { firstPlace: number; secondPlace: number; thirdPlace: number | null }> = {};
+  const payoutConfigs: Record<
+    string,
+    { firstPlace: number; secondPlace: number; thirdPlace: number | null }
+  > = {};
   for (const ls of leagueStandings) {
     const payout = await getPayoutByDivisionId(ls.division.id);
     payoutConfigs[ls.division.id] = payout
-      ? { firstPlace: payout.firstPlace, secondPlace: payout.secondPlace, thirdPlace: payout.thirdPlace }
+      ? {
+          firstPlace: payout.firstPlace,
+          secondPlace: payout.secondPlace,
+          thirdPlace: payout.thirdPlace,
+        }
       : DEFAULT_PAYOUT;
   }
 
@@ -827,10 +858,10 @@ const { leagueStandings, payoutConfigs } = useLoaderData<typeof loader>();
 Add a helper to compute weekly total:
 
 ```typescript
-  const getWeeklyTotal = (divisionId: string) => {
-    const config = payoutConfigs[divisionId] || DEFAULT_PAYOUT;
-    return config.firstPlace + config.secondPlace + (config.thirdPlace || 0);
-  };
+const getWeeklyTotal = (divisionId: string) => {
+  const config = payoutConfigs[divisionId] || DEFAULT_PAYOUT;
+  return config.firstPlace + config.secondPlace + (config.thirdPlace || 0);
+};
 ```
 
 Replace the hardcoded `225` footer block. Change from:
@@ -848,8 +879,11 @@ to:
 ```tsx
 <Text size="2">{`${
   leagueStanding.standings[0].matchRecord.length
-} weeks x ${formatCurrency(getWeeklyTotal(leagueStanding.division.id))} = ${formatCurrency(
-  leagueStanding.standings[0].matchRecord.length * getWeeklyTotal(leagueStanding.division.id),
+} weeks x ${formatCurrency(
+  getWeeklyTotal(leagueStanding.division.id),
+)} = ${formatCurrency(
+  leagueStanding.standings[0].matchRecord.length *
+    getWeeklyTotal(leagueStanding.division.id),
 )}`}</Text>
 ```
 
@@ -873,6 +907,7 @@ git commit -m "feat: use division payout config in standings audit footer"
 ### Task 8: Add payout configuration UI to admin divisions page
 
 **Files:**
+
 - Modify: `app/routes/_p.admin.$league.divisions.tsx`
 
 - [ ] **Step 1: Update loader to include payout data**
@@ -904,7 +939,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
       return {
         ...division,
         payout: payout
-          ? { firstPlace: payout.firstPlace, secondPlace: payout.secondPlace, thirdPlace: payout.thirdPlace }
+          ? {
+              firstPlace: payout.firstPlace,
+              secondPlace: payout.secondPlace,
+              thirdPlace: payout.thirdPlace,
+            }
           : null,
       };
     }),
@@ -919,19 +958,25 @@ export async function loader({ params }: LoaderFunctionArgs) {
 In the `action` function, add a new case for saving payout config:
 
 ```typescript
-  if (action === "savePayout") {
-    const divisionId = formData.get("divisionId") as string;
-    const firstPlace = Number(formData.get("firstPlace"));
-    const secondPlace = Number(formData.get("secondPlace"));
-    const thirdPlaceRaw = formData.get("thirdPlace") as string;
-    const thirdPlace = thirdPlaceRaw ? Number(thirdPlaceRaw) : null;
+if (action === "savePayout") {
+  const divisionId = formData.get("divisionId") as string;
+  const firstPlace = Number(formData.get("firstPlace"));
+  const secondPlace = Number(formData.get("secondPlace"));
+  const thirdPlaceRaw = formData.get("thirdPlace") as string;
+  const thirdPlace = thirdPlaceRaw ? Number(thirdPlaceRaw) : null;
 
-    invariant(Boolean(divisionId), "division id is required");
-    invariant(!isNaN(firstPlace) && firstPlace > 0, "1st place amount is required");
-    invariant(!isNaN(secondPlace) && secondPlace > 0, "2nd place amount is required");
+  invariant(Boolean(divisionId), "division id is required");
+  invariant(
+    !isNaN(firstPlace) && firstPlace > 0,
+    "1st place amount is required",
+  );
+  invariant(
+    !isNaN(secondPlace) && secondPlace > 0,
+    "2nd place amount is required",
+  );
 
-    return upsertDivisionPayout(divisionId, firstPlace, secondPlace, thirdPlace);
-  }
+  return upsertDivisionPayout(divisionId, firstPlace, secondPlace, thirdPlace);
+}
 ```
 
 - [ ] **Step 3: Add payout config form UI for each division**
@@ -980,27 +1025,37 @@ export default function AdminDivisions() {
               <input type="hidden" name="divisionId" value={division.id} />
               <Flex gap="3" align="end" wrap="wrap">
                 <label>
-                  <Text size="1" weight="bold" mb="1" as="p">1st Place ($)</Text>
+                  <Text size="1" weight="bold" mb="1" as="p">
+                    1st Place ($)
+                  </Text>
                   <TextField.Root
                     name="firstPlace"
                     type="number"
-                    defaultValue={division.payout?.firstPlace ?? DEFAULT_PAYOUT.firstPlace}
+                    defaultValue={
+                      division.payout?.firstPlace ?? DEFAULT_PAYOUT.firstPlace
+                    }
                     min={0}
                     style={{ width: 80 }}
                   />
                 </label>
                 <label>
-                  <Text size="1" weight="bold" mb="1" as="p">2nd Place ($)</Text>
+                  <Text size="1" weight="bold" mb="1" as="p">
+                    2nd Place ($)
+                  </Text>
                   <TextField.Root
                     name="secondPlace"
                     type="number"
-                    defaultValue={division.payout?.secondPlace ?? DEFAULT_PAYOUT.secondPlace}
+                    defaultValue={
+                      division.payout?.secondPlace ?? DEFAULT_PAYOUT.secondPlace
+                    }
                     min={0}
                     style={{ width: 80 }}
                   />
                 </label>
                 <label>
-                  <Text size="1" weight="bold" mb="1" as="p">3rd Place ($)</Text>
+                  <Text size="1" weight="bold" mb="1" as="p">
+                    3rd Place ($)
+                  </Text>
                   <TextField.Root
                     name="thirdPlace"
                     type="number"
