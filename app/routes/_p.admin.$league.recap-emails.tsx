@@ -258,12 +258,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY || "");
-  const { error } = await resend.emails.send({
-    from: "Tuesday Twi League <news@mail.afternoongolfer.com>",
-    to: recipients,
-    subject: `Week ${weekNumber} Recap — ${formatDate(weekDate)}`,
-    html,
-  });
+  const { error } = await resend.batch.send(
+    recipients.map((email) => ({
+      from: "Tuesday Twi League <news@mail.afternoongolfer.com>",
+      to: email,
+      subject: `Week ${weekNumber} Recap — ${formatDate(weekDate)}`,
+      html,
+    })),
+  );
 
   if (error) {
     return json(
