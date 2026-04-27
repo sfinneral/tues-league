@@ -25,7 +25,10 @@ import { Resend } from "resend";
 import { getScores } from "~/components/WeekResults";
 import WeeklyRecapEmail from "~/emails/weekly-recap";
 import type { WeeklyRecapProps } from "~/emails/weekly-recap";
-import { getDivisionTeamsUsersProfileByLeagueSlug } from "~/models/division.server";
+import {
+  DEFAULT_PAYOUT,
+  getDivisionTeamsUsersProfileByLeagueSlug,
+} from "~/models/division.server";
 import { getLeagueBySlug } from "~/models/league.server";
 import type { MatchWithScoresAndTeams } from "~/models/match.server";
 import {
@@ -159,7 +162,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
       };
     });
 
-    const scores = getScores(matches);
+    const payoutConfig = schedule.division.payout
+      ? {
+          firstPlace: schedule.division.payout.firstPlace,
+          secondPlace: schedule.division.payout.secondPlace,
+          thirdPlace: schedule.division.payout.thirdPlace,
+        }
+      : DEFAULT_PAYOUT;
+    const scores = getScores(matches, payoutConfig);
     const moneyWinners = scores
       .filter((s) => s.place)
       .map((s) => ({
