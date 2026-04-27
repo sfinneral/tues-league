@@ -69,12 +69,22 @@ model PlayoffMatch {
 }
 
 model Division {
-  id       String    @id @default(cuid())
+  id       String          @id @default(cuid())
   name     String
   teams    Team[]
   leagueId String
-  league   League    @relation(fields: [leagueId], references: [id])
+  league   League          @relation(fields: [leagueId], references: [id])
   schedule Schedule?
+  payout   DivisionPayout?
+}
+
+model DivisionPayout {
+  id          String   @id @default(cuid())
+  firstPlace  Int
+  secondPlace Int
+  thirdPlace  Int?
+  divisionId  String   @unique
+  division    Division @relation(fields: [divisionId], references: [id], onDelete: Cascade)
 }
 
 model Team {
