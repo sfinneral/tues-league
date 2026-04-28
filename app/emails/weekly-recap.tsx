@@ -239,12 +239,6 @@ export default function WeeklyRecapEmail({
                         {row.wins}-{row.losses}
                         {row.ties > 0 ? `-${row.ties}` : ""}
                       </td>
-                      <td
-                        style={{ ...standingsCell, width: "50px" }}
-                        align="right"
-                      >
-                        {row.points} pts
-                      </td>
                     </tr>
                   ))}
                 </table>
@@ -263,7 +257,9 @@ export default function WeeklyRecapEmail({
                   <div style={card}>
                     {division.matchups.map((matchup, i) => (
                       <Text key={i} style={matchupText}>
-                        {matchup.team1} vs {matchup.team2}
+                        {matchup.team1}{" "}
+                        <span style={{ color: "#94a3b8" }}>vs</span>{" "}
+                        {matchup.team2}
                       </Text>
                     ))}
                   </div>
