@@ -31,20 +31,16 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 export default function LeagueMembers() {
   const { divisions, usersTeam, subs } = useLoaderData<typeof loader>();
+  const smsRoot = "sms://open?addresses=";
   const emailRoot = "mailto:";
-
-  const isIOS =
-    typeof navigator !== "undefined" &&
-    /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const smsSeparator = isIOS ? "," : ";";
 
   const smsLink = (team: TeamWithUsers) => {
     const allUsers = [...team.users, ...(usersTeam?.users || [])];
     return (
-      "sms:" +
+      smsRoot +
       allUsers
         .map((user) => cleanedPhoneNumber(user.profile?.phoneNumber))
-        .join(smsSeparator)
+        .join(",")
     );
   };
 
@@ -54,10 +50,10 @@ export default function LeagueMembers() {
   };
 
   const smsAllSubs =
-    "sms:" +
+    smsRoot +
     subs
       ?.map((sub) => cleanedPhoneNumber(sub.user.profile?.phoneNumber))
-      .join(smsSeparator);
+      .join(",");
 
   return (
     <div>
@@ -127,7 +123,7 @@ export default function LeagueMembers() {
                     <Flex gap="2">
                       <a
                         href={
-                          "sms:" +
+                          smsRoot +
                           cleanedPhoneNumber(sub.user.profile?.phoneNumber)
                         }
                       >
