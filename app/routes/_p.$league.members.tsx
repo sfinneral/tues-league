@@ -31,7 +31,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 export default function LeagueMembers() {
   const { divisions, usersTeam, subs } = useLoaderData<typeof loader>();
-  const smsRoot = "sms://open?addresses=";
+  const smsRoot = "sms:";
   const emailRoot = "mailto:";
 
   const smsLink = (team: TeamWithUsers) => {
