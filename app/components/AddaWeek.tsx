@@ -1,13 +1,15 @@
 import { Team } from "@prisma/client";
 import { Button, Flex, TextField, Select } from "@radix-ui/themes";
+import { Form } from "@remix-run/react";
 import { MouseEventHandler, useMemo, useState } from "react";
 import { getTeamName } from "~/utils";
 
 interface AddaWeekProps {
   teams: Team[];
+  scheduleId: string;
 }
 
-export default function AddaWeek({ teams = [] }: AddaWeekProps) {
+export default function AddaWeek({ teams = [], scheduleId }: AddaWeekProps) {
   const [showForm, setShowForm] = useState(false);
   const [matches, setMatches] = useState<{ team1: Team; team2: Team }[]>([]);
   const [selectedTeam1, setSelectedTeam1] = useState<string | null>(null);
@@ -66,82 +68,91 @@ export default function AddaWeek({ teams = [] }: AddaWeekProps) {
           Add a week
         </Button>
       ) : (
-        <Flex direction="column" gap="3" className="my-3">
-          <TextField.Root placeholder="date" type="date" name="weekDate" />
+        <Form method="post">
+          <Flex direction="column" gap="3" className="my-3">
+            <input type="hidden" name="scheduleId" value={scheduleId} />
+            <TextField.Root placeholder="date" type="date" name="weekDate" />
 
-          {matches.length > 0 ? (
-            <div>
-              <div className="text-sm font-medium mb-1">Scheduled Matches:</div>
-              {matches.map((match, index) => (
-                <Flex key={index} gap="2" align="center" className="py-1">
-                  <div className="font-medium">{getTeamName(match.team1)}</div>
-                  <div className="text-gray-500">vs</div>
-                  <div className="font-medium">{getTeamName(match.team2)}</div>
-                </Flex>
-              ))}
-            </div>
-          ) : null}
-          <Flex gap="2" align="center">
-            <Select.Root
-              name="team1Id"
-              value={selectedTeam1 || undefined}
-              onValueChange={handleTeam1Change}
-            >
-              <Select.Trigger placeholder="Select Team 1" />
-              <Select.Content>
-                {availableTeam1s.map((team) => (
-                  <Select.Item key={team.id} value={team.id}>
-                    {getTeamName(team)}
-                  </Select.Item>
+            {matches.length > 0 ? (
+              <div>
+                <div className="text-sm font-medium mb-1">
+                  Scheduled Matches:
+                </div>
+                {matches.map((match, index) => (
+                  <Flex key={index} gap="2" align="center" className="py-1">
+                    <div className="font-medium">
+                      {getTeamName(match.team1)}
+                    </div>
+                    <div className="text-gray-500">vs</div>
+                    <div className="font-medium">
+                      {getTeamName(match.team2)}
+                    </div>
+                  </Flex>
                 ))}
-              </Select.Content>
-            </Select.Root>
+              </div>
+            ) : null}
+            <Flex gap="2" align="center">
+              <Select.Root
+                name="team1Id"
+                value={selectedTeam1 || undefined}
+                onValueChange={handleTeam1Change}
+              >
+                <Select.Trigger placeholder="Select Team 1" />
+                <Select.Content>
+                  {availableTeam1s.map((team) => (
+                    <Select.Item key={team.id} value={team.id}>
+                      {getTeamName(team)}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
 
-            <span>vs</span>
+              <span>vs</span>
 
-            <Select.Root
-              name="team2Id"
-              value={selectedTeam2 || undefined}
-              onValueChange={handleTeam2Change}
-            >
-              <Select.Trigger placeholder="Select Team 2" />
-              <Select.Content>
-                {availableTeam2s.map((team) => (
-                  <Select.Item key={team.id} value={team.id}>
-                    {getTeamName(team)}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-            <input
-              type="hidden"
-              name="matches"
-              value={JSON.stringify(
-                matches.map((match) => ({
-                  team1: match.team1.id,
-                  team2: match.team2.id,
-                })),
-              )}
-            />
-            <Button variant="soft" type="button" onClick={handleAddMatch}>
-              Add
-            </Button>
+              <Select.Root
+                name="team2Id"
+                value={selectedTeam2 || undefined}
+                onValueChange={handleTeam2Change}
+              >
+                <Select.Trigger placeholder="Select Team 2" />
+                <Select.Content>
+                  {availableTeam2s.map((team) => (
+                    <Select.Item key={team.id} value={team.id}>
+                      {getTeamName(team)}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+              <input
+                type="hidden"
+                name="matches"
+                value={JSON.stringify(
+                  matches.map((match) => ({
+                    team1: match.team1.id,
+                    team2: match.team2.id,
+                  })),
+                )}
+              />
+              <Button variant="soft" type="button" onClick={handleAddMatch}>
+                Add
+              </Button>
+            </Flex>
+
+            <Flex gap="3" justify="end">
+              <Button
+                type="submit"
+                name="_action"
+                value="addWeek"
+                disabled={matches.length < teams.length / 2}
+              >
+                Add week
+              </Button>
+              <Button variant="soft" type="button" onClick={cancelAddWeek}>
+                Cancel
+              </Button>
+            </Flex>
           </Flex>
-
-          <Flex gap="3" justify="end">
-            <Button
-              type="submit"
-              name="_action"
-              value="addWeek"
-              disabled={matches.length < teams.length / 2}
-            >
-              Add week
-            </Button>
-            <Button variant="soft" type="button" onClick={cancelAddWeek}>
-              Cancel
-            </Button>
-          </Flex>
-        </Flex>
+        </Form>
       )}
     </div>
   );

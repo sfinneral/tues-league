@@ -130,7 +130,12 @@ export default function AdminSchedules() {
                 />
               )}
             </Flex>
-            <AddaWeek teams={division.teams} />
+            {division.schedule ? (
+              <AddaWeek
+                teams={division.teams}
+                scheduleId={division.schedule.id}
+              />
+            ) : null}
           </div>
         ))}
       </Card>
