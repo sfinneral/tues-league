@@ -12,6 +12,12 @@ stored in https://fly.io/apps/tues-league-bf86/secrets
 Might need to manually push db changes
 connect to server then `npx prisma db push`
 
+## switch order of playoff teams
+
+- find `data-all-switches` on the match element
+- append new match id to `data-all-switches` and add to `PLAYOFF_SWITCHES` secret
+- as of 8/26/26 `["cmej8hxdw002ao1k7az5dbkzq","cmeuf2vb8001io1k6kfxemx7e","cmeuf11rr001go1k6oa680fgv","cmtadchcs00eqo1kde7rao6pw"]`
+
 # Built with Remix Indie Stack
 
 Learn more about [Remix Stacks](https://remix.run/stacks).
