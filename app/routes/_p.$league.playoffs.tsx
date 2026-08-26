@@ -78,13 +78,14 @@ export default function LeaguePlayoffs() {
                         <>
                           <Text
                             data-match-id={match?.id}
+                            data-all-switches={playoffSwitches}
                             size="1"
                             className="p-2 border-b border-gray-600 whitespace-nowrap"
                           >
                             {match?.teams[0]
                               ? getTeamName(
-                                  match.teams[shouldSwitch(match.id) ? 1 : 0],
-                                )
+                                match.teams[shouldSwitch(match.id) ? 1 : 0],
+                              )
                               : "\u00A0"}
                           </Text>
                           {isSteve ? (
@@ -102,8 +103,8 @@ export default function LeaguePlayoffs() {
                           >
                             {match?.teams[1]
                               ? getTeamName(
-                                  match.teams[shouldSwitch(match.id) ? 0 : 1],
-                                )
+                                match.teams[shouldSwitch(match.id) ? 0 : 1],
+                              )
                               : "\u00A0"}
                           </Text>
                         </>
