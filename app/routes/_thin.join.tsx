@@ -12,11 +12,20 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useActionData,
+  useLoaderData,
+  useSearchParams,
+} from "@remix-run/react";
 import { useEffect, useRef } from "react";
 import InlineError from "~/components/InlineError";
+import TurnstileWidget from "~/components/TurnstileWidget";
 
 import { createUser, getUserByEmail } from "~/models/user.server";
+import { getClientIp } from "~/services/rate-limit.server";
+import { verifyTurnstileToken } from "~/services/turnstile.server";
 import { createUserSession, getUserId } from "~/session.server";
 import { safeRedirect, validateEmail } from "~/utils";
 
@@ -25,7 +34,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (userId) {
     return redirect("/");
   }
-  return null;
+  return json({ turnstileSiteKey: process.env.TURNSTILE_SITE_KEY ?? "" });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -37,6 +46,24 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const phoneNumber = formData.get("phoneNumber");
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
 
+  const ip = getClientIp(request);
+  const turnstileToken = formData.get("cf-turnstile-response");
+  if (!(await verifyTurnstileToken(turnstileToken, ip))) {
+    return json(
+      {
+        errors: {
+          email: null,
+          password: null,
+          firstName: null,
+          lastName: null,
+          phoneNumber: null,
+          turnstile: "Verification failed. Please try again.",
+        },
+      },
+      { status: 400 },
+    );
+  }
+
   if (typeof firstName !== "string" || firstName.length === 0) {
     return json(
       {
@@ -46,6 +73,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           firstName: "First name is required",
           lastName: null,
           phoneNumber: null,
+          turnstile: null,
         },
       },
       { status: 400 },
@@ -61,6 +89,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           lastName: "Last name is required",
           firstName: null,
           phoneNumber: null,
+          turnstile: null,
         },
       },
       { status: 400 },
@@ -76,6 +105,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           firstName: null,
           lastName: null,
           phoneNumber: null,
+          turnstile: null,
         },
       },
       { status: 400 },
@@ -91,6 +121,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           firstName: null,
           lastName: null,
           phoneNumber: null,
+          turnstile: null,
         },
       },
       { status: 400 },
@@ -106,6 +137,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           firstName: null,
           lastName: null,
           phoneNumber: null,
+          turnstile: null,
         },
       },
       { status: 400 },
@@ -122,6 +154,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           firstName: null,
           lastName: null,
           phoneNumber: null,
+          turnstile: null,
         },
       },
       { status: 400 },
@@ -137,6 +170,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           lastName: null,
           firstName: null,
           phoneNumber: "Phone number is required",
+          turnstile: null,
         },
       },
       { status: 400 },
@@ -162,6 +196,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export const meta: MetaFunction = () => [{ title: "Sign Up" }];
 
 export default function Join() {
+  const { turnstileSiteKey } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") ?? undefined;
   const actionData = useActionData<typeof action>();
@@ -255,6 +290,10 @@ export default function Join() {
         />
         {actionData?.errors?.phoneNumber ? (
           <InlineError>{actionData.errors.phoneNumber}</InlineError>
+        ) : null}
+        <TurnstileWidget siteKey={turnstileSiteKey} />
+        {actionData?.errors?.turnstile ? (
+          <InlineError>{actionData.errors.turnstile}</InlineError>
         ) : null}
         <input type="hidden" name="redirectTo" value={redirectTo} />
         <Flex justify="between" align="center">
